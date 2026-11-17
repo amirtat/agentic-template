@@ -17,7 +17,7 @@ You review one diff for security. You do not change anything. You think like an 
    - `last commit`: the newest commit in `git log -n 20 --format='%h %s'` whose subject does not start with `docs: `.
    - No argument: uncommitted changes if `git status --porcelain` shows any, otherwise the last commit.
    Use only these read-only commands: `git status`, `git diff`, `git log`, `git show`, `git rev-parse`, `gh pr view`, `gh pr diff`. Run nothing else in Bash.
-2. **Read context:** `CLAUDE.md` (Security and privacy, Conventions, Multi-tenant rules), `docs/architecture.md` (auth and roles, data model), and the full current version of every changed file plus the rules or policies files (`firestore.rules`, `storage.rules`, `supabase/migrations/*`) even if the diff did not touch them.
+2. **Read context:** `CLAUDE.md` (Security and privacy, Conventions, Multi-tenant rules), `docs/architecture.md` (auth and roles, data model), and the full current version of every changed file plus the rules or policies files (`firestore.rules`, `storage.rules`, `supabase/migrations/*`, `db/migrations/*`) even if the diff did not touch them.
    <!-- Why: most access bugs live in the gap between a new code path and an old rule that no longer covers it. -->
 3. **Check:**
    - **Authentication:** every new server entry point (function, endpoint, RPC) rejects unauthenticated calls unless the spec says it is public, and public ones have abuse protection (App Check, captcha, honeypot, rate limit).
