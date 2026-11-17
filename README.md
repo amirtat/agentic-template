@@ -39,7 +39,15 @@ node global/install-global.mjs
 
 ## פרויקט במאגר של לקוח
 
-כשהקוד צריך להיות בבעלות הלקוח, הלקוח פותח מאגר **ריק** בארגון שלו ב-GitHub (Private, בלי README, `.gitignore` או רישיון) ונותן לך הרשאת Admin עליו. "Use this template" לא עובד שם, כי אין לך הרשאה ליצור מאגרים בארגון של הלקוח. לכן מעתיקים את התבנית עם היסטוריה חדשה:
+כשהקוד צריך להיות בבעלות הלקוח, הלקוח פותח מאגר **ריק** בארגון שלו ב-GitHub ונותן לך הרשאת Admin עליו. "Use this template" לא עובד שם, כי אין לך הרשאה ליצור מאגרים בארגון של הלקוח.
+
+**מה הלקוח עושה** (מחובר לחשבון ה-GitHub של החברה):
+
+1. אם עוד אין ארגון: `+` בראש המסך -> New organization -> Free -> שם הארגון ומייל קשר של החברה -> "A business or institution" עם השם הרשמי של החברה.
+2. בארגון: New repository -> שם המאגר -> **Private** -> בלי README, בלי `.gitignore` ובלי רישיון -> Create repository.
+3. במאגר: Settings -> Collaborators and teams -> Add people -> `amirtat` -> Role: **Admin** -> Add.
+
+**מה אתה עושה:** מאשר את ההזמנה מהמייל או מ-https://github.com/notifications, ומוודא שאתה רואה את המאגר. אחר כך מעתיקים את התבנית עם היסטוריה חדשה:
 
 ```bash
 git clone --depth 1 https://github.com/amirtat/agentic-template.git <project>
