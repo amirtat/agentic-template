@@ -37,6 +37,26 @@ node global/install-global.mjs
 5. `/design-brief`.
 6. הפיצ'ר הראשון: לפי `WORKFLOW.md`.
 
+## פרויקט במאגר של לקוח
+
+כשהקוד צריך להיות בבעלות הלקוח, הלקוח פותח מאגר **ריק** בארגון שלו ב-GitHub (Private, בלי README, `.gitignore` או רישיון) ונותן לך הרשאת Admin עליו. "Use this template" לא עובד שם, כי אין לך הרשאה ליצור מאגרים בארגון של הלקוח. לכן מעתיקים את התבנית עם היסטוריה חדשה:
+
+```bash
+git clone --depth 1 https://github.com/amirtat/agentic-template.git <project>
+cd <project>
+rm -rf .git
+git init -b main
+git add .
+git commit -m "Initial commit from agentic template"
+git remote add origin https://github.com/<client-org>/<repo>.git
+git push -u origin main
+```
+
+- התוצאה זהה ל-"Use this template": commit אחד, בלי ההיסטוריה של התבנית ובלי קישור אליה. התבנית נשארת פרטית.
+- ה-push הזה הוא היחיד שהולך ישר ל-`main`, כי המאגר ריק. משם עובדים על branches כרגיל.
+- ממשיכים מצעד 2 של "פרויקט חדש".
+- בהסכם עם הלקוח כדאי לכתוב שכלי הפיתוח והתבניות (`.claude/`, `.githooks/`, `scripts/`) נשארים בבעלותך, וללקוח ניתן רישיון שימוש בהם במסגרת הפרויקט.
+
 ## פרויקט קיים
 
 מעתיקים את התיקיות `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `specs/` ואת `CLAUDE.md` (רק אם אין), על branch נפרד. אחר כך `/agentic-init`, ואז `/bootstrap-docs`.
