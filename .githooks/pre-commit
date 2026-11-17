@@ -1,0 +1,11 @@
+#!/bin/sh
+# Pre-commit hook: blocks a commit that adds an em dash to user-facing files.
+# Runs only on staged files, so it is fast. Bypassing with --no-verify is not allowed (see CLAUDE.md).
+root=$(git rev-parse --show-toplevel) || exit 0
+cd "$root" || exit 0
+command -v node >/dev/null 2>&1 || { echo "pre-commit: node not found, skipping check-copy"; exit 0; }
+node scripts/check-copy.mjs --staged || {
+  echo "pre-commit: fix the problems above, stage the files again, and commit."
+  exit 1
+}
+exit 0

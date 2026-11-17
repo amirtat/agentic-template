@@ -1,0 +1,30 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+coverage/
+.firebase/
+playwright-report/
+test-results/
+
+# Secrets: never commit. .env.example is the committed list of variable names.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+*serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# Local Claude Code state
+.claude/.state/
+.claude/settings.local.json
+
+# Private paperwork that may hold personal data
+documents/
+
+# OS and editors
+.DS_Store
+.vscode/
+.idea/

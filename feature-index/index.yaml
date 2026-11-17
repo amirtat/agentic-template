@@ -1,0 +1,15 @@
+# Feature index: pointers from each feature to the files, data and docs behind it.
+# Read this before navigating the code, then open only the files listed for the feature at hand.
+# The post-commit hook adds and updates entries. Keep each entry short.
+#
+# Entry shape:
+# - id: kebab-case-id
+#   name: Human name
+#   what: One line on what the feature does.
+#   files:
+#     - path/to/file.ext
+#   data:
+#     - collection or table name
+#   docs: docs/flows/<flow>.md
+
+features: []

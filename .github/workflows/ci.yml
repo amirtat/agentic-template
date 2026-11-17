@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Copy check (no em dash in user-facing text)
+        run: npm run check-copy
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit and integration tests
+        run: npm test
+
+      # CUSTOMIZE: /agentic-init adds profile steps here (Java for the Firebase emulators,
+      # supabase/setup-cli + supabase start, rules tests, pgTAP tests).
+
+      - name: Install Playwright browsers
+        if: hashFiles('playwright.config.*') != ''
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: E2E tests (desktop + mobile)
+        if: hashFiles('playwright.config.*') != ''
+        run: npm run test:e2e
+
+  # CUSTOMIZE: deploy job, on main only, after checks. Leave it commented out until the secrets exist.
+  # deploy:
+  #   needs: checks
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: echo "profile-specific deploy steps"
