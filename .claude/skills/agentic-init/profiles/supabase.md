@@ -59,7 +59,7 @@ Config comes from `.env` (copy `.env.example`). Local work runs against a local 
 All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (react-i18next). The root sets `lang` and `dir` from the active language. A new string is added to every language file in the same commit.
 
 ## Baseline
-- Scaffold (new project only): `npm create vite@latest . -- --template react`, then `npm i @supabase/supabase-js react-router-dom`, `npm i -D vitest @playwright/test supabase eslint`, and `npx supabase init`.
+- Scaffold (new project only): `npm create vite@latest . -- --template react`, then `npm i @supabase/supabase-js react-router-dom`, `npm i -D vitest @playwright/test supabase eslint eslint-config-prettier prettier`, and `npx supabase init`.
 - First migration: an empty `profiles` table linked to `auth.users`, with RLS enabled and a "user reads own row" policy.
 - Smoke tests: one Vitest unit test, one pgTAP test (RLS is enabled on every public table), one E2E test.
 

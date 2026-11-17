@@ -44,7 +44,7 @@ Not applicable to this profile. If the owner answers yes, stop and suggest the f
 
 ## Baseline
 - Create `site/index.html` (with `lang="he" dir="rtl"` and a viewport meta tag), `site/css/tokens.css`, `site/css/main.css`, `site/js/i18n.js`, `site/i18n/he.js`.
-- `npm i -D vitest @playwright/test eslint serve`; `dev` script: `serve site -l 5173`.
+- `npm i -D vitest @playwright/test eslint eslint-config-prettier prettier serve`; `dev` script: `serve site -l 5173`.
 - Smoke tests: one Vitest unit test, one E2E test.
 
 ## CI

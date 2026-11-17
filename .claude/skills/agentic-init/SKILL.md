@@ -27,7 +27,8 @@ Turns the template into this project's setup. Profiles live next to this file in
    - Multi-tenant -> add the profile's "Multi-tenant" rules to Conventions and Security.
    Delete the `TEMPLATE:` comment at the top of `CLAUDE.md`. Leave no `{{` placeholder behind. Delete any profile text that does not apply.
 4. **Scaffold the baseline** as the profile's "Baseline" section describes. If the repo has no application code, scaffold the minimal app with the official tool named in the profile; show the command and ask before running it. Always:
-   - `package.json` keeps `"postinstall": "git config core.hooksPath .githooks || true"` and the `check-copy` script, and gains `lint`, `test`, `test:e2e` scripts.
+   - `package.json` keeps `"postinstall": "git config core.hooksPath .githooks || true"` and the `check-copy` script, and gains `lint`, `format` (`prettier --write .`), `test`, `test:e2e` scripts.
+   - Prettier is installed (the `format-on-edit` hook formats each file Claude edits with it) with a `.prettierrc` of `{ "singleQuote": true, "printWidth": 100 }` and a `.prettierignore` that skips `dist`, `coverage`, `docs`, `specs` and lock files. ESLint uses `eslint-config-prettier` so the two never fight.
    - `playwright.config` has two projects, `desktop` and `mobile` (a phone device profile), and a `webServer` that starts the app.
    - The strings file and the tokens file exist at the paths the profile names, and the root HTML has `lang="he" dir="rtl"` (or the first language's values).
    - One smoke test per level: unit, integration (if the profile has a server or rules), E2E (loads the home page on desktop and mobile, checks the main heading and no horizontal scroll).
