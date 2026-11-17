@@ -12,7 +12,10 @@
       "Bash(firebase deploy:*)",
       "Bash(npx firebase deploy:*)",
       "Bash(supabase db push:*)",
-      "Bash(npx supabase db push:*)"
+      "Bash(npx supabase db push:*)",
+      "Bash(gcloud sql:*)",
+      "Bash(cloud-sql-proxy:*)",
+      "Bash(./cloud-sql-proxy:*)"
     ]
   },
   "hooks": {

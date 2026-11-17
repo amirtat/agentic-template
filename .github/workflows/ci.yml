@@ -29,7 +29,8 @@ jobs:
         run: npm test
 
       # CUSTOMIZE: /agentic-init adds profile steps here (Java for the Firebase emulators,
-      # supabase/setup-cli + supabase start, rules tests, pgTAP tests).
+      # supabase/setup-cli + supabase start, rules tests, pgTAP tests, or a Postgres
+      # service container + migrations + database tests for firebase-postgres).
 
       - name: Install Playwright browsers
         if: hashFiles('playwright.config.*') != ''

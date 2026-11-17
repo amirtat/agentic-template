@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Agentic init
 
-Turns the template into this project's setup. Profiles live next to this file in `profiles/`: `static.md`, `firebase.md`, `supabase.md`.
+Turns the template into this project's setup. Profiles live next to this file in `profiles/`: `static.md`, `firebase.md`, `supabase.md`, `firebase-postgres.md`.
 
 ## Steps
 
@@ -14,13 +14,13 @@ Turns the template into this project's setup. Profiles live next to this file in
 2. **Interview.** Ask in one message, with a suggested answer for each:
    1. Project name and one paragraph: what it does and for whom.
    2. User roles (for example: admin, viewer, end user).
-   3. Stack profile: `static` (HTML, CSS, JS, no server or database; GitHub Pages or Netlify), `firebase` (React + Vite + Firebase), or `supabase` (React + Vite + Supabase).
+   3. Stack profile: `static` (HTML, CSS, JS, no server or database; GitHub Pages or Netlify), `firebase` (React + Vite + Firebase), `supabase` (React + Vite + Supabase), or `firebase-postgres` (React + Vite + Firebase Hosting + Identity Platform + Cloud SQL Postgres with RLS; for B2B and multi-tenant apps with enterprise sign-in).
    4. Multi-tenant? If yes, what is a tenant (council, company, team)?
    5. Languages: Hebrew only, or several from day one (which)?
    6. Deploy target and how deploys happen (CI on push to `main` is the default).
    7. Personal data handled (names, phone, ID numbers, documents)? This sets the security-reviewer scope.
    Wait for the answers. Do not guess.
-3. **Read the chosen profile** in `profiles/` and fill `CLAUDE.md`:
+3. **Read the chosen profile** in `profiles/`. If it has an "Extra questions" section, ask those now and wait for the answers. Then fill `CLAUDE.md`:
    - `{{PROJECT_NAME}}`, `{{ONE_PARAGRAPH...}}` from answers 1 and 2.
    - `{{STACK_TABLE}}`, `{{COMMANDS}}`, `{{CONVENTIONS}}`, `{{SECURITY_RULES}}`, `{{TEST_RULES}}` from the profile's sections of the same names.
    - `{{I18N_RULE}}`: Hebrew only -> "Today the app is Hebrew only; keep strings keyed so a second language is a new file, not a refactor." Several languages -> the profile's "Multi-language" section.
@@ -41,6 +41,7 @@ Turns the template into this project's setup. Profiles live next to this file in
    2. Run `/design-brief`.
    3. Existing code only: run `/bootstrap-docs`.
    4. First feature: `/product <feature>`.
+   5. If the profile has an "Owner setup" section: list its steps as a checklist for the owner.
 
 ## Do not
 

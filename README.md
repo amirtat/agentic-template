@@ -32,7 +32,7 @@ node global/install-global.mjs
 
 1. ב-GitHub: **Use this template** -> ריפו חדש -> clone.
 2. `npm install` (מחבר את ה-git hooks אוטומטית).
-3. ב-Claude Code: `/agentic-init`. עונים על השאלות (פרופיל: `static`, `firebase` או `supabase`).
+3. ב-Claude Code: `/agentic-init`. עונים על השאלות (פרופיל: `static`, `firebase`, `supabase` או `firebase-postgres`).
 4. בודקים את השינויים ועושים commit על branch.
 5. `/design-brief`.
 6. הפיצ'ר הראשון: לפי `WORKFLOW.md`.
