@@ -17,6 +17,7 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
      <!-- Why: role and label locators test what users see and survive refactors. Test ids couple tests to markup. -->
    - Use the exact labels, headings and messages from the contract.
    - Every test runs in both Playwright projects, `desktop` and `mobile`. Where the contract lists a mobile difference, branch on the project name (`testInfo.project.name`) and assert the mobile behavior. Add at least one check that the page has no horizontal scroll on mobile (`document.documentElement.scrollWidth <= window.innerWidth`).
+   - Accessibility: every test that reaches a screen or opens a dialog calls `expectNoA11yViolations(page)` from `e2e/a11y.js` in that state. For each form or dialog the feature adds, one test completes it with the keyboard alone (Tab, Shift+Tab, Enter, Escape) and checks where focus lands.
    - Set up the contract's "assumed test data" explicitly, with invented data. Each test creates what it needs and does not depend on another test's leftovers or on run order.
    - Cover failure, empty and permission cases the criteria list, not just the happy path.
 3. **Run the new tests** with the command from `CLAUDE.md` and confirm two things:
@@ -34,7 +35,7 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
    <!-- Why: a locator is how a test finds the thing. An assertion is what the spec says must be true. Editing assertions turns tests into a mirror of the code. -->
 7. **If an assertion fails**, or an assertion needs to change, do not fix it. Report the failure with the criterion number and evidence, and send the user back through the spec (`/product`), or to `/dev` if the code is wrong.
 8. **Write the test report** to `specs/features/<timestamp>-<name>.test-report.md`, reusing the spec's exact timestamp and name. Keep it short:
-   - Result per level (unit, integration, E2E desktop, E2E mobile, lint, copy check): command run, passed / failed / not run counts.
+   - Result per level (unit, integration, E2E desktop, E2E mobile, accessibility checks, lint, copy check): command run, passed / failed / not run counts. For accessibility, list any axe rule that failed and where.
    - Acceptance criteria table: `AC#`, covering test(s), status.
    - Locator changes made (or "none").
    - Failures: criterion, test, one-line cause.

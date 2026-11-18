@@ -18,7 +18,7 @@ Decide the phase from the request: `plan` or `implement`.
    <!-- Why: the shared prefix is how spec, plan and test report stay linked. -->
    Sections:
    - **Approach**: a short summary and any tradeoff worth the reviewer's attention (performance, security, hard to reverse, deviation from CLAUDE.md).
-   - **Coverage**: a table mapping every acceptance criterion and every UI contract item (including the mobile items) to the change that satisfies it.
+   - **Coverage**: a table mapping every acceptance criterion and every UI contract item (including the mobile and accessibility items) to the change that satisfies it.
      <!-- Why: a criterion without a row is a criterion that gets forgotten. -->
    - **Files to change**: path and one-line purpose each, grouped by area.
    - **Data changes**: new collections, tables, fields, indexes, migrations, rules or policies, and how each is reversed. Write "none" if none.
@@ -35,6 +35,7 @@ Decide the phase from the request: `plan` or `implement`.
 7. **Implement** exactly the approved plan, following `CLAUDE.md` (working rules, product rules, conventions, security) and `docs/design-brief.md`.
    - Use the labels and messages from the spec's UI contract verbatim, through the strings file, never hard-coded.
    - Every screen you add or change works at 375px wide. Use logical CSS properties only.
+   - Follow the "Accessible" product rule: native elements, labels, keyboard use, visible focus, announced messages.
    - No em dash in any user-facing text.
    If you must deviate from the plan, stop and say so before doing it.
 8. **Write tests for new and changed code only.**

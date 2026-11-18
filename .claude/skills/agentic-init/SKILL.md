@@ -19,19 +19,25 @@ Turns the template into this project's setup. Profiles live next to this file in
    5. Languages: Hebrew only, or several from day one (which)?
    6. Deploy target and how deploys happen (CI on push to `main` is the default).
    7. Personal data handled (names, phone, ID numbers, documents)? This sets the security-reviewer scope.
+   8. Install to the home screen (PWA)? Suggest yes for apps people open often on the phone, no for back-office tools.
+   9. Who can reach the app: the general public, or only signed-in customers or employees? Public-facing apps need an accessibility statement page.
    Wait for the answers. Do not guess.
 3. **Read the chosen profile** in `profiles/`. If it has an "Extra questions" section, ask those now and wait for the answers. Then fill `CLAUDE.md`:
    - `{{PROJECT_NAME}}`, `{{ONE_PARAGRAPH...}}` from answers 1 and 2.
    - `{{STACK_TABLE}}`, `{{COMMANDS}}`, `{{CONVENTIONS}}`, `{{SECURITY_RULES}}`, `{{TEST_RULES}}` from the profile's sections of the same names.
    - `{{I18N_RULE}}`: Hebrew only -> "Today the app is Hebrew only; keep strings keyed so a second language is a new file, not a refactor." Several languages -> the profile's "Multi-language" section.
    - Multi-tenant -> add the profile's "Multi-tenant" rules to Conventions and Security.
+   - PWA -> read `pwa.md` next to this file and add its "Product rule" to Product rules.
+   - Public-facing -> add to Product rules: "**Accessibility statement.** A page with the accessibility statement (הצהרת נגישות) is linked from the footer of every page, as Israeli regulations require. Its content comes from the owner."
    Delete the `TEMPLATE:` comment at the top of `CLAUDE.md`. Leave no `{{` placeholder behind. Delete any profile text that does not apply.
 4. **Scaffold the baseline** as the profile's "Baseline" section describes. If the repo has no application code, scaffold the minimal app with the official tool named in the profile; show the command and ask before running it. Always:
    - `package.json` keeps `"postinstall": "git config core.hooksPath .githooks || true"` and the `check-copy` script, and gains `lint`, `format` (`prettier --write .`), `test`, `test:e2e` scripts.
    - Prettier is installed (the `format-on-edit` hook formats each file Claude edits with it) with a `.prettierrc` of `{ "singleQuote": true, "printWidth": 100 }` and a `.prettierignore` that skips `dist`, `coverage`, `docs`, `specs` and lock files. ESLint uses `eslint-config-prettier` so the two never fight.
    - `playwright.config` has two projects, `desktop` and `mobile` (a phone device profile), and a `webServer` that starts the app.
    - The strings file and the tokens file exist at the paths the profile names, and the root HTML has `lang="he" dir="rtl"` (or the first language's values).
-   - One smoke test per level: unit, integration (if the profile has a server or rules), E2E (loads the home page on desktop and mobile, checks the main heading and no horizontal scroll).
+   - Accessibility checks: `npm i -D @axe-core/playwright`, and a helper `e2e/a11y.js` exporting `expectNoA11yViolations(page)`. It runs axe with the tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and fails on any `serious` or `critical` violation, listing each rule id, target and help URL.
+   - One smoke test per level: unit, integration (if the profile has a server or rules), E2E (loads the home page on desktop and mobile, checks the main heading, no horizontal scroll, and `expectNoA11yViolations`).
+   - PWA -> everything in the "Baseline" and "Tests" sections of `pwa.md`.
    - `.env.example` lists every variable the profile needs, with placeholders. Never write real values.
    - `.github/workflows/ci.yml`: adjust the steps as the profile's "CI" section says.
    - `scripts/check-copy.mjs`: set `SCAN_PATHS` to the profile's source folders.
@@ -42,6 +48,7 @@ Turns the template into this project's setup. Profiles live next to this file in
    3. Existing code only: run `/bootstrap-docs`.
    4. First feature: `/product <feature>`.
    5. If the profile has an "Owner setup" section: list its steps as a checklist for the owner.
+   6. PWA: the "Owner notes" from `pwa.md` (real icons to supply, how users install). Public-facing: the owner writes the accessibility statement text.
 
 ## Do not
 

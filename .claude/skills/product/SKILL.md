@@ -22,13 +22,14 @@ Input: a feature request from the user. Output: one spec file at
 5. **Write the spec** with exactly these sections, in this order:
    - **Summary**: what and why, two or three sentences.
    - **User stories**: `As a <role>, I want ... so that ...`, using the roles in `docs/architecture.md`. Include at least one edge-case story.
-   - **Acceptance criteria**: numbered (`AC1`, `AC2`, ...). Each one is observable and testable: a specific input or action and a specific result, including the status or error where the server is involved. Cover failure and permission cases, not only the happy path. Include at least one criterion for the mobile layout of any screen the feature adds or changes.
+   - **Acceptance criteria**: numbered (`AC1`, `AC2`, ...). Each one is observable and testable: a specific input or action and a specific result, including the status or error where the server is involved. Cover failure and permission cases, not only the happy path. Include at least one criterion for the mobile layout of any screen the feature adds or changes, and one for completing any new form or dialog with the keyboard alone.
      <!-- Why: dev and qa cite these numbers. Vague criteria ("works well") cannot be tested, so they get skipped. -->
    - **UI contract**: only what E2E tests need, no styling:
      - Routes, and which role can access each (and what other roles see or where they are redirected).
      - Visible labels, headings, button text and messages, written exactly as they must appear, in Hebrew. No em dash (U+2014) in any of them; use a regular hyphen.
      - Key states: empty, error, success (and loading if the test must wait on it).
      - Mobile (375px wide): what changes from desktop, for example a table shown as cards or a menu behind a button. Anything not listed stays the same.
+     - Accessibility: the accessible name of every control the tests use (what `getByRole` finds), where focus goes when a dialog or form opens and closes, what is announced on success and error, and the text alternative of every meaningful image or icon. Everything else follows the "Accessible" rule in `CLAUDE.md`.
      - Assumed test data: the records, users, roles and statuses the tests start from. Invented data only, never real personal data.
      - A `data-testid` only where no role or label can identify the element. Name it here.
      <!-- Why: qa writes tests from this section before the feature exists. Anything not listed is something the test author has to guess. -->
