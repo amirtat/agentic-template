@@ -19,10 +19,10 @@ disable-model-invocation: true
    5. Anything to avoid.
    6. Density: data-heavy screens, or spacious and simple?
 3. **Write `docs/design-brief.md`** with the sections already in the template: Audience and feel, Principles (3 to 5 that settle arguments), Layout, Components, Copy tone, States, Tokens. Keep it under 120 lines.
-   - Layout always includes: designed at 375px first, then widened; RTL first with logical CSS properties; touch targets of at least 44px.
+   - Layout always includes: designed at 375px first, then widened; RTL first with logical CSS properties; touch targets of at least 44px; a clearly visible focus style; nothing that relies on color alone.
    - Copy tone always includes: Hebrew, one consistent form of address, no em dash (use a regular hyphen).
    - States: what loading, empty, error and success look like and say.
-4. **Write the tokens file** at the path `CLAUDE.md` names for styling tokens (create it there if missing): colors with names by role (`--color-surface`, `--color-text`, `--color-primary`, `--color-danger` ...), font families, a type scale, spacing scale, radii, shadows. Check that text colors meet WCAG AA contrast (4.5:1) on their surfaces and say which pairs you checked.
+4. **Write the tokens file** at the path `CLAUDE.md` names for styling tokens (create it there if missing): colors with names by role (`--color-surface`, `--color-text`, `--color-primary`, `--color-danger` ...), font families, a type scale, spacing scale, radii, shadows. Include `--color-focus` for the focus ring. Check that text colors meet WCAG AA contrast (4.5:1, or 3:1 for large text) on their surfaces, and that the focus ring and input borders reach 3:1 against their background. Say which pairs you checked.
 5. **Report** both paths and the principles in one short list, and ask the owner to review and edit the brief by hand.
 
 ## Taste

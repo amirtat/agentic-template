@@ -33,7 +33,8 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 - **Hebrew first, RTL correct.** The default language is Hebrew (`<html lang="he" dir="rtl">`). Use logical CSS properties only (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `text-align: start`), never left/right, so LTR works without a rewrite.
 - **All user-facing text in one place.** Every string shown to users lives in the strings file named in Conventions, never hard-coded in a component. {{I18N_RULE}}
 - **No em dash.** User-facing text never contains the em dash character (U+2014). Use a regular hyphen (-). `npm run check-copy` enforces this in pre-commit and CI.
-<!-- Why: owner's standing product rules. The em dash rule has a script because models add em dashes on their own, and a written rule alone does not stop that. -->
+- **Accessible (WCAG 2.1 AA, Israeli Standard 5568).** Native semantic HTML first: real buttons and links, headings in order, landmarks (`header`, `nav`, `main`, `footer`). ARIA only where no native element fits. Every input has a visible label. Everything works with the keyboard alone, with a visible focus and a logical order. Text contrast is at least 4.5:1 (3:1 for large text and UI parts). Meaningful images and icons have a text alternative; decorative ones are hidden from screen readers. Errors and success messages are announced and errors are tied to their field. No information by color alone. Respect `prefers-reduced-motion`. Every screen works at 200% zoom. E2E checks every screen with axe.
+<!-- Why: owner's standing product rules. Accessibility is a legal requirement for digital services in Israel and is cheap only when built in from the first screen. The em dash rule has a script because models add em dashes on their own, and a written rule alone does not stop that. -->
 
 ## Conventions
 <!-- CUSTOMIZE: patterns the code already follows (or will follow). Describe what is, not an ideal. -->
