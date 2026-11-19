@@ -1,53 +1,79 @@
 # Agentic Template
 
-תבנית לכל פרויקט חדש: Agentic SDLC עם Claude Code. מבוססת על הקורס "AI for Developers with Claude Code" ועל ה-kit של [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc), עם התאמות לשיטת העבודה שלי.
+A starting point for any new project built with [Claude Code](https://claude.com/claude-code) using an **agentic SDLC**: a fixed cycle of spec, tests, plan, review, implementation, review and verification, where each step is a focused skill or subagent and deterministic hooks catch what the model forgets.
 
-## מה יש כאן
+Clone it, run one setup command, answer a few questions, and the project has a filled-in `CLAUDE.md`, a test baseline (unit, integration, E2E on desktop and mobile, accessibility checks), CI, and self-maintaining docs.
+
+## What's inside
 
 ```
-CLAUDE.md                      חוקת הפרויקט. מתמלאת ע"י /agentic-init
-WORKFLOW.md                    דף עזר: מחזור פיתוח של פיצ'ר, 10 שלבים
+CLAUDE.md                      Project rules. Filled in by /agentic-init
+WORKFLOW.md                    Cheat sheet: the 10-step feature cycle
+copy-rules.json                Characters to forbid in user-facing text (empty by default)
 docs/                          architecture, design-brief, flows/
-feature-index/index.yaml       פיצ'ר -> קבצים, נתונים, docs
-specs/features/                spec, plan, test-report לכל פיצ'ר
-.claude/settings.json          hooks + חסימות (סודות, deploy, force push)
-.claude/hooks/                 protect-files, format-on-edit, long-file guard (אופציונלי)
+feature-index/index.yaml       Feature -> files, data, docs (navigation for the agent)
+specs/features/                Spec, plan and test report for each feature
+.claude/settings.json          Hooks + deny rules (secrets, deploy, force push)
+.claude/hooks/                 protect-files, format-on-edit, optional long-file guard
 .claude/skills/                agentic-init, product, dev, qa, design-brief, bootstrap-docs, handoff
 .claude/agents/                plan-reviewer (Opus), code-reviewer, security-reviewer (Opus)
-.githooks/                     pre-commit (em dash), post-commit (עדכון docs + feature-index)
+.githooks/                     pre-commit (copy rules), post-commit (updates docs + feature index)
 scripts/                       check-copy.mjs, update-docs.sh
-.github/workflows/ci.yml       check-copy, lint, tests, E2E
-global/install-global.mjs      שכבה גלובלית ל-~/.claude (פעם אחת למחשב)
+.github/workflows/ci.yml       Copy check, lint, tests, E2E
+global/install-global.mjs      One-time setup for ~/.claude on your machine
 ```
 
-## פעם אחת למחשב
+### Skills (slash commands)
+
+| Skill | What it does |
+|---|---|
+| `/agentic-init` | One-time setup: interviews you (product, roles, stack, languages, tenancy, accessibility law, PWA) and fills `CLAUDE.md` from a stack profile. Profiles: `static`, `firebase`, `supabase`, `firebase-postgres`. |
+| `/product` | Feature request to spec: user stories, numbered acceptance criteria, UI contract (including mobile). |
+| `/qa` | Writes Playwright E2E tests from the spec **before** the code exists, then verifies the finished feature. |
+| `/dev` | Writes a plan to a file and stops for approval; then implements it with unit and integration tests. |
+| `/design-brief` | Interviews you and writes the visual direction and a design tokens file. |
+| `/bootstrap-docs` | One-time docs for an existing codebase, using parallel explore subagents. |
+| `/handoff` | A short structured report to forward to an outside reviewer. |
+
+### Subagents
+
+- `plan-reviewer` (Opus): checks a plan against the spec, docs and rules before any code is written.
+- `code-reviewer`: reviews a commit or PR for correctness, conventions, tests, and whether the docs were updated.
+- `security-reviewer` (Opus): authentication, authorization, tenant isolation, personal data, secrets.
+
+### Hooks
+
+- **Claude Code:** blocks any access to `.env`, keys and service-account files; formats edited files with Prettier; checks copy rules after every edit.
+- **Git:** pre-commit enforces the copy rules; post-commit runs headless Claude to update `docs/` and `feature-index/index.yaml` in a separate `docs:` commit.
+
+## One-time setup per machine
 
 ```bash
 node global/install-global.mjs
 ```
 
-מוסיף ל-`~/.claude/settings.json` את ה-hook שחוסם גישה ל-`.env` ולמפתחות בכל הפרויקטים, ואת הצליל כש-Claude צריך אותך (אם עוד לא קיים). מגבה את הקובץ לפני שינוי, ואפשר להריץ שוב בלי כפילויות.
+Adds the secret-file guard to `~/.claude/settings.json` for every project, and on macOS a sound when Claude needs you (if you don't have one). It backs up the file first and is safe to run again.
 
-## פרויקט חדש
+## New project
 
-1. ב-GitHub: **Use this template** -> ריפו חדש -> clone.
-2. `npm install` (מחבר את ה-git hooks אוטומטית).
-3. ב-Claude Code: `/agentic-init`. עונים על השאלות (פרופיל: `static`, `firebase`, `supabase` או `firebase-postgres`).
-4. בודקים את השינויים ועושים commit על branch.
+1. On GitHub: **Use this template** -> new repository -> clone it.
+2. `npm install` (installs the git hooks through `postinstall`).
+3. In Claude Code: `/agentic-init`, and answer the questions.
+4. Review the changes and commit them on a branch.
 5. `/design-brief`.
-6. הפיצ'ר הראשון: לפי `WORKFLOW.md`.
+6. First feature: follow `WORKFLOW.md`.
 
-## פרויקט במאגר של לקוח
+## Project in a client's repository
 
-כשהקוד צריך להיות בבעלות הלקוח, הלקוח פותח מאגר **ריק** בארגון שלו ב-GitHub ונותן לך הרשאת Admin עליו. "Use this template" לא עובד שם, כי אין לך הרשאה ליצור מאגרים בארגון של הלקוח.
+When the client must own the code, they create an **empty** repository in their GitHub organization and give you Admin access to it. "Use this template" does not work there, because you cannot create repositories in their organization.
 
-**מה הלקוח עושה** (מחובר לחשבון ה-GitHub של החברה):
+**The client** (signed in to the company's GitHub account):
 
-1. אם עוד אין ארגון: `+` בראש המסך -> New organization -> Free -> שם הארגון ומייל קשר של החברה -> "A business or institution" עם השם הרשמי של החברה.
-2. בארגון: New repository -> שם המאגר -> **Private** -> בלי README, בלי `.gitignore` ובלי רישיון -> Create repository.
-3. במאגר: Settings -> Collaborators and teams -> Add people -> `amirtat` -> Role: **Admin** -> Add.
+1. If there is no organization yet: `+` at the top -> New organization -> Free -> organization name and a company contact email -> "A business or institution" with the company's legal name.
+2. In the organization: New repository -> name -> **Private** -> no README, no `.gitignore`, no license -> Create repository.
+3. In the repository: Settings -> Collaborators and teams -> Add people -> `<your GitHub user>` -> Role: **Admin** -> Add.
 
-**מה אתה עושה:** מאשר את ההזמנה מהמייל או מ-https://github.com/notifications, ומוודא שאתה רואה את המאגר. אחר כך מעתיקים את התבנית עם היסטוריה חדשה:
+**You:** accept the invitation (email or https://github.com/notifications), then copy the template with a fresh history:
 
 ```bash
 git clone --depth 1 https://github.com/amirtat/agentic-template.git <project>
@@ -60,25 +86,33 @@ git remote add origin https://github.com/<client-org>/<repo>.git
 git push -u origin main
 ```
 
-- התוצאה זהה ל-"Use this template": commit אחד, בלי ההיסטוריה של התבנית ובלי קישור אליה. התבנית נשארת פרטית.
-- ה-push הזה הוא היחיד שהולך ישר ל-`main`, כי המאגר ריק. משם עובדים על branches כרגיל.
-- ממשיכים מצעד 2 של "פרויקט חדש".
-- בהסכם עם הלקוח כדאי לכתוב שכלי הפיתוח והתבניות (`.claude/`, `.githooks/`, `scripts/`) נשארים בבעלותך, וללקוח ניתן רישיון שימוש בהם במסגרת הפרויקט.
+- The result is the same as "Use this template": one commit, no template history.
+- This is the only push that goes straight to `main`, because the repository is empty. From then on, work on branches.
+- Continue from step 2 of "New project".
+- Agree with the client on who owns the tooling (`.claude/`, `.githooks/`, `scripts/`). This template is MIT licensed, so either way works.
 
-## פרויקט קיים
+## Existing project
 
-מעתיקים את התיקיות `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `specs/` ואת `CLAUDE.md` (רק אם אין), על branch נפרד. אחר כך `/agentic-init`, ואז `/bootstrap-docs`.
+On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `specs/`, `copy-rules.json`, and `CLAUDE.md` (only if the project has none). Then run `/agentic-init`, then `/bootstrap-docs`.
 
-## כללים קבועים בכל פרויקט
+## Rules every project gets
 
-- מובייל מלא: כל מסך עובד ב-375px, ו-E2E רץ גם על מובייל.
-- עברית ו-RTL כברירת מחדל, CSS לוגי בלבד, כל הטקסטים בקובץ אחד.
-- נגישות לפי WCAG 2.1 AA (ת"י 5568): HTML סמנטי, מקלדת, ניגודיות, ובדיקת axe אוטומטית בכל מסך ב-E2E. באפליקציה ציבורית גם עמוד הצהרת נגישות.
-- התקנה למסך הבית (PWA): לא אוטומטית. `/agentic-init` שואל, ואם כן מוסיף לפי `pwa.md`.
-- בלי em dash בטקסטים של האפליקציה. נאכף ב-hook, ב-pre-commit וב-CI.
-- אין deploy ואין push בלי אישור מפורש. CI ירוק קודם.
-- אין סודות בקוד. `.env` חסום לקריאה ע"י Claude.
+- **Fully responsive:** every screen works at 375px wide; E2E runs on desktop and mobile.
+- **Any language, either direction:** the primary language and its direction are set at init. Logical CSS properties only, all user-facing text in one strings file.
+- **Accessible:** WCAG 2.1 AA, plus the local law for your users' country (for example EN 301 549, ADA and Section 508, Israeli Standard 5568). Semantic HTML, keyboard, contrast, and an automatic axe check on every screen in E2E. Public apps can get an accessibility statement page.
+- **Installable (PWA):** optional. `/agentic-init` asks, and adds it from `pwa.md` if you say yes.
+- **Copy rules:** optional. Forbid characters such as the em dash in user-facing text; enforced after every edit, in pre-commit and in CI.
+- **No deploy and no push** without explicit approval. CI must be green first.
+- **No secrets in code.** Claude is blocked from reading `.env`.
 
-## שיפור התבנית
+## Credits
 
-כל שיפור ל-skill, agent או hook שהוכח בפרויקט חוזר לכאן ב-PR.
+Built during the course **AI for Developers with Claude Code**. The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted from the course's demo repository, [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+
+## Contributing
+
+Improvements to a skill, agent or hook that proved themselves in a real project are welcome as pull requests.
+
+## License
+
+[MIT](LICENSE)

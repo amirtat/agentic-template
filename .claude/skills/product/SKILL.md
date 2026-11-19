@@ -26,7 +26,7 @@ Input: a feature request from the user. Output: one spec file at
      <!-- Why: dev and qa cite these numbers. Vague criteria ("works well") cannot be tested, so they get skipped. -->
    - **UI contract**: only what E2E tests need, no styling:
      - Routes, and which role can access each (and what other roles see or where they are redirected).
-     - Visible labels, headings, button text and messages, written exactly as they must appear, in Hebrew. No em dash (U+2014) in any of them; use a regular hyphen.
+     - Visible labels, headings, button text and messages, written exactly as they must appear, in the app's primary language, and following the copy rules in `CLAUDE.md` (if any).
      - Key states: empty, error, success (and loading if the test must wait on it).
      - Mobile (375px wide): what changes from desktop, for example a table shown as cards or a menu behind a button. Anything not listed stays the same.
      - Accessibility: the accessible name of every control the tests use (what `getByRole` finds), where focus goes when a dialog or form opens and closes, what is announced on success and error, and the text alternative of every meaningful image or icon. Everything else follows the "Accessible" rule in `CLAUDE.md`.

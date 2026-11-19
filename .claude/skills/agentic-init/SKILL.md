@@ -16,25 +16,30 @@ Turns the template into this project's setup. Profiles live next to this file in
    2. User roles (for example: admin, viewer, end user).
    3. Stack profile: `static` (HTML, CSS, JS, no server or database; GitHub Pages or Netlify), `firebase` (React + Vite + Firebase), `supabase` (React + Vite + Supabase), or `firebase-postgres` (React + Vite + Firebase Hosting + Identity Platform + Cloud SQL Postgres with RLS; for B2B and multi-tenant apps with enterprise sign-in).
    4. Multi-tenant? If yes, what is a tenant (council, company, team)?
-   5. Languages: Hebrew only, or several from day one (which)?
+   5. Languages: the primary UI language (is it right-to-left, like Hebrew or Arabic?), and any more languages from day one.
    6. Deploy target and how deploys happen (CI on push to `main` is the default).
    7. Personal data handled (names, phone, ID numbers, documents)? This sets the security-reviewer scope.
    8. Install to the home screen (PWA)? Suggest yes for apps people open often on the phone, no for back-office tools.
-   9. Who can reach the app: the general public, or only signed-in customers or employees? Public-facing apps need an accessibility statement page.
+   9. Who can reach the app: the general public, or only signed-in customers or employees? Public-facing apps may need an accessibility statement page.
+   10. The country or region of most users. It sets the local accessibility law next to WCAG.
+   11. Copy rules: characters to forbid in user-facing text, for example the em dash (models overuse it). Default: none.
    Wait for the answers. Do not guess.
 3. **Read the chosen profile** in `profiles/`. If it has an "Extra questions" section, ask those now and wait for the answers. Then fill `CLAUDE.md`:
    - `{{PROJECT_NAME}}`, `{{ONE_PARAGRAPH...}}` from answers 1 and 2.
    - `{{STACK_TABLE}}`, `{{COMMANDS}}`, `{{CONVENTIONS}}`, `{{SECURITY_RULES}}`, `{{TEST_RULES}}` from the profile's sections of the same names.
-   - `{{I18N_RULE}}`: Hebrew only -> "Today the app is Hebrew only; keep strings keyed so a second language is a new file, not a refactor." Several languages -> the profile's "Multi-language" section.
+   - `{{LANGUAGE_RULE}}`: "The primary language is <language> (`<html lang="<code>" dir="<ltr or rtl>">`)." For a right-to-left language add: "Check every screen in right-to-left; icons that show direction (arrows, back) are mirrored."
+   - `{{I18N_RULE}}`: one language -> "Today the app is <language> only; keep strings keyed so a second language is a new file, not a refactor." Several languages -> the profile's "Multi-language" section.
+   - `{{COPY_RULE}}`: no copy rules -> delete the placeholder line. Otherwise write each forbidden character to `copy-rules.json` (`{ "forbidden": [{ "char": "\u2014", "name": "em dash", "fix": "use a regular hyphen (-)" }] }`), and replace the line with: "- **Copy rules.** User-facing text never contains <the list, each with its fix>. `npm run check-copy` enforces this after every edit, in pre-commit and in CI."
+   - `{{A11Y_LOCAL_STANDARD}}`: from answer 10: Israel -> ", Israeli Standard 5568"; European Union -> ", EN 301 549"; United States -> ", ADA and Section 508"; United Kingdom -> ", Equality Act 2010"; anywhere else -> nothing (WCAG alone).
    - Multi-tenant -> add the profile's "Multi-tenant" rules to Conventions and Security.
    - PWA -> read `pwa.md` next to this file and add its "Product rule" to Product rules.
-   - Public-facing -> add to Product rules: "**Accessibility statement.** A page with the accessibility statement (הצהרת נגישות) is linked from the footer of every page, as Israeli regulations require. Its content comes from the owner."
+   - Public-facing, where local law asks for one (for example Israel, and the public sector in the European Union and the United Kingdom) -> add to Product rules: "**Accessibility statement.** A page with the accessibility statement is linked from the footer of every page. Its content comes from the owner."
    Delete the `TEMPLATE:` comment at the top of `CLAUDE.md`. Leave no `{{` placeholder behind. Delete any profile text that does not apply.
 4. **Scaffold the baseline** as the profile's "Baseline" section describes. If the repo has no application code, scaffold the minimal app with the official tool named in the profile; show the command and ask before running it. Always:
    - `package.json` keeps `"postinstall": "git config core.hooksPath .githooks || true"` and the `check-copy` script, and gains `lint`, `format` (`prettier --write .`), `test`, `test:e2e` scripts.
    - Prettier is installed (the `format-on-edit` hook formats each file Claude edits with it) with a `.prettierrc` of `{ "singleQuote": true, "printWidth": 100 }` and a `.prettierignore` that skips `dist`, `coverage`, `docs`, `specs` and lock files. ESLint uses `eslint-config-prettier` so the two never fight.
    - `playwright.config` has two projects, `desktop` and `mobile` (a phone device profile), and a `webServer` that starts the app.
-   - The strings file and the tokens file exist at the paths the profile names, and the root HTML has `lang="he" dir="rtl"` (or the first language's values).
+   - The strings file and the tokens file exist at the paths the profile names, and the root HTML has the primary language's `lang` and `dir`.
    - Accessibility checks: `npm i -D @axe-core/playwright`, and a helper `e2e/a11y.js` exporting `expectNoA11yViolations(page)`. It runs axe with the tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and fails on any `serious` or `critical` violation, listing each rule id, target and help URL.
    - One smoke test per level: unit, integration (if the profile has a server or rules), E2E (loads the home page on desktop and mobile, checks the main heading, no horizontal scroll, and `expectNoA11yViolations`).
    - PWA -> everything in the "Baseline" and "Tests" sections of `pwa.md`.

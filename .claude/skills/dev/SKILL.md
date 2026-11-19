@@ -36,7 +36,7 @@ Decide the phase from the request: `plan` or `implement`.
    - Use the labels and messages from the spec's UI contract verbatim, through the strings file, never hard-coded.
    - Every screen you add or change works at 375px wide. Use logical CSS properties only.
    - Follow the "Accessible" product rule: native elements, labels, keyboard use, visible focus, announced messages.
-   - No em dash in any user-facing text.
+   - Follow the copy rules in `CLAUDE.md` (if any) in every user-facing text.
    If you must deviate from the plan, stop and say so before doing it.
 8. **Write tests for new and changed code only.**
    - **Unit tests:** every new or changed unit of logic gets a unit test covering success, failure and edge cases.

@@ -19,7 +19,7 @@ Input: the path of a plan file. If none was given, list `specs/features/` and re
    - **Acceptance criteria:** every criterion has a row in the Coverage table, and the change listed for it would actually satisfy it.
    - **UI contract:** every route and its role access, label, heading, message, state, mobile item, accessibility item and test-data assumption is covered, with exact wording kept.
    - **Existing flows:** the plan does not break or contradict behavior in `docs/flows/`. Name the flow when it does.
-   - **CLAUDE.md:** working rules (map first on risky areas), conventions, security and privacy, product rules (responsive at 375px, logical CSS, strings in the strings file, no em dash, accessible to WCAG 2.1 AA).
+   - **CLAUDE.md:** working rules (map first on risky areas), conventions, security and privacy, product rules (responsive at 375px, logical CSS, strings in the strings file, copy rules, accessible to WCAG 2.1 AA).
    - **Data changes:** every new collection, table, field, rule or policy is listed with how it is reversed, and access to it is enforced on the server side (rules, policies or functions), not only in the client.
    - **Tenancy** (multi-tenant projects): every new read and write is scoped to the caller's tenant on the server side, and tests prove another tenant is denied.
    - **Design brief:** component and copy rules for any UI the plan adds.

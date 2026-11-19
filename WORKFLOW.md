@@ -1,28 +1,28 @@
-# מחזור פיתוח של פיצ'ר
+# The feature cycle
 
-עובדים על branch של הפיצ'ר. כל שלב נגמר ב-commit. `<spec>` ו-`<plan>` הם הנתיבים ש-`/product` ו-`/dev` יוצרים תחת `specs/features/`.
+Work on a feature branch. Every step ends with a commit. `<spec>` and `<plan>` are the paths `/product` and `/dev` create under `specs/features/`.
 
-| מה אתה עושה | הפקודה ב-Claude Code | מודל | סשן | שלב | # |
+| # | Step | Session | Model | Command in Claude Code | What you do |
 | --- | --- | --- | --- | --- | --- |
-| עונה על שאלות, בודק AC ו-UI contract (כולל מובייל), commit | `/product <פיצ'ר + מה מחוץ ל-scope>` | Sonnet | `/clear` | Spec | 1 |
-| מוודא שנכשלות מהסיבה הנכונה, commit | `/qa phase 1: write e2e tests for @<spec>` | Sonnet | `/clear` | E2E קודם | 2 |
-| קורא, עדיין לא מאשר | `/dev plan @<spec>` | Opus | `/clear` | Plan | 3 |
-| מחליט מה להחיל, commit | `run the plan-reviewer on the plan` ואז `apply the issues you agree with; do not re-run the reviewer` | Opus | אותו סשן | Plan review | 4 |
-| קורא את ה-diff | `/dev implement @<plan>` | Sonnet | `/clear` | Implement | 5 |
-| קורא את commit ה-docs שה-hook מוסיף | commit (הודעה שלא מתחילה ב-`docs:`) | - | - | Commit | 6 |
-| מחליט מה אמיתי | `@code-reviewer last commit`; באזורים רגישים גם `@security-reviewer last commit` (רץ על Opus) | Sonnet | `/clear` | Code review | 7 |
-| commit נפרד | `fix the Critical and Major items` | Sonnet | אותו סשן | Fix | 8 |
-| commit ל-test report | `/qa @<spec> feature is fully implemented` | Sonnet | `/clear` | Verify | 9 |
-| בדיקה ויזואלית באתר החי, גם במובייל | push אחרי אישור; CI עושה deploy | - | - | Push + Deploy | 10 |
+| 1 | Spec | `/clear` | Sonnet | `/product <feature + what is out of scope>` | Answer questions, check the acceptance criteria and the UI contract (including mobile), commit |
+| 2 | E2E first | `/clear` | Sonnet | `/qa phase 1: write e2e tests for @<spec>` | Make sure they fail for the right reason, commit |
+| 3 | Plan | `/clear` | Opus | `/dev plan @<spec>` | Read it; don't approve yet |
+| 4 | Plan review | same session | Opus | `run the plan-reviewer on the plan`, then `apply the issues you agree with; do not re-run the reviewer` | Decide which issues to apply, commit |
+| 5 | Implement | `/clear` | Sonnet | `/dev implement @<plan>` | Read the diff |
+| 6 | Commit | - | - | commit (the message must not start with `docs:`) | Read the docs commit the hook adds |
+| 7 | Code review | `/clear` | Sonnet | `@code-reviewer last commit`; in sensitive areas also `@security-reviewer last commit` (runs on Opus) | Decide which findings are real |
+| 8 | Fix | same session | Sonnet | `fix the Critical and Major items` | Separate commit |
+| 9 | Verify | `/clear` | Sonnet | `/qa @<spec> feature is fully implemented` | Commit the test report |
+| 10 | Push + deploy | - | - | push after your approval; CI deploys | Check the live site visually, on mobile too |
 
-בסוף כל שלב אפשר להריץ `/handoff` ולהעביר את הדו"ח לבדיקה חיצונית.
+At the end of any step you can run `/handoff` and forward the report for an outside review.
 
-## הערות
+## Notes
 
-- **מודל:** `/model opus` לפני שלב 3, ו-`/model sonnet` לפני שלב 5.
-- **לא Plan mode:** `/dev plan` כותב את התוכנית לקובץ. אל תשתמש במצב Plan המובנה (Shift+Tab).
-- **מסך שעוד מחפשים לו צורה:** מדלגים על שלב 2. בשלב 9, `/qa` כותב את ה-E2E מה-spec בסשן נקי.
-- **תיקון קטן** (טעות הקלדה, טקסט): שלבים 5, 6, 7 בלבד.
-- **Agent תקוע או טועה:** קוראים את הקובץ שהוא כתב, מתקנים את ה-spec או ה-plan, ומריצים את השלב שוב. לא מתקנים תוכנית שגויה בתוך הקוד.
-- **חזרה לשלב קודם:** `git reset --hard <commit>`, רק על ה-branch של הפיצ'ר.
-- **ה-hook של ה-docs לא עשה כלום:** `tail -f .git/update-docs.log`.
+- **Model:** `/model opus` before step 3, and `/model sonnet` before step 5.
+- **No Plan mode:** `/dev plan` writes the plan to a file. Don't use Claude Code's built-in Plan mode (Shift+Tab).
+- **A screen whose shape is still being explored:** skip step 2. In step 9, `/qa` writes the E2E tests from the spec in a clean session.
+- **Small fix** (a typo, a text change): steps 5, 6 and 7 only.
+- **Agent stuck or wrong:** read the file it wrote, fix the spec or the plan, and run the step again. Don't fix a wrong plan inside the code.
+- **Going back a step:** `git reset --hard <commit>`, only on the feature branch.
+- **The docs hook did nothing:** `tail -f .git/update-docs.log`.

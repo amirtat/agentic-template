@@ -16,7 +16,7 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 ## Commands
 <!-- CUSTOMIZE: real commands and the folder to run each from -->
 {{COMMANDS}}
-- Copy check (from the repo root): `npm run check-copy`.
+- Copy check (from the repo root): `npm run check-copy` (enforces the rules in `copy-rules.json`).
 <!-- Why: Claude must run the real commands from the right folder. -->
 
 ## Working rules
@@ -26,15 +26,15 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 - **Never deploy and never push** without the owner's explicit approval in this session. CI must be green first.
 - **No secrets in code.** Config and secrets come from `.env`; add every new variable to `.env.example` with a placeholder.
 - Before navigating the codebase, read `feature-index/index.yaml` and open only the files listed for the feature at hand.
-<!-- Why: these are the owner's standing rules. Each one prevents a mistake that already happened in an earlier project. -->
+<!-- Why: each rule prevents a common and expensive agent mistake: guessing a root cause, pushing half-done work, or leaking a secret. -->
 
 ## Product rules (every app)
 - **Fully responsive.** Every screen works at 375px wide with no horizontal scroll. Touch targets are at least 44px. Wide tables become cards or scroll inside their own container. E2E tests run on desktop and on a mobile device profile.
-- **Hebrew first, RTL correct.** The default language is Hebrew (`<html lang="he" dir="rtl">`). Use logical CSS properties only (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `text-align: start`), never left/right, so LTR works without a rewrite.
+- **Language and direction.** {{LANGUAGE_RULE}} Use logical CSS properties only (`margin-inline-start`, `padding-inline-end`, `inset-inline-start`, `text-align: start`), never left/right, so the layout works in both left-to-right and right-to-left languages without a rewrite.
 - **All user-facing text in one place.** Every string shown to users lives in the strings file named in Conventions, never hard-coded in a component. {{I18N_RULE}}
-- **No em dash.** User-facing text never contains the em dash character (U+2014). Use a regular hyphen (-). `npm run check-copy` enforces this in pre-commit and CI.
-- **Accessible (WCAG 2.1 AA, Israeli Standard 5568).** Native semantic HTML first: real buttons and links, headings in order, landmarks (`header`, `nav`, `main`, `footer`). ARIA only where no native element fits. Every input has a visible label. Everything works with the keyboard alone, with a visible focus and a logical order. Text contrast is at least 4.5:1 (3:1 for large text and UI parts). Meaningful images and icons have a text alternative; decorative ones are hidden from screen readers. Errors and success messages are announced and errors are tied to their field. No information by color alone. Respect `prefers-reduced-motion`. Every screen works at 200% zoom. E2E checks every screen with axe.
-<!-- Why: owner's standing product rules. Accessibility is a legal requirement for digital services in Israel and is cheap only when built in from the first screen. The em dash rule has a script because models add em dashes on their own, and a written rule alone does not stop that. -->
+{{COPY_RULE}}
+- **Accessible (WCAG 2.1 AA{{A11Y_LOCAL_STANDARD}}).** Native semantic HTML first: real buttons and links, headings in order, landmarks (`header`, `nav`, `main`, `footer`). ARIA only where no native element fits. Every input has a visible label. Everything works with the keyboard alone, with a visible focus and a logical order. Text contrast is at least 4.5:1 (3:1 for large text and UI parts). Meaningful images and icons have a text alternative; decorative ones are hidden from screen readers. Errors and success messages are announced and errors are tied to their field. No information by color alone. Respect `prefers-reduced-motion`. Every screen works at 200% zoom. E2E checks every screen with axe.
+<!-- Why: product rules that apply to every app. Accessibility is a legal requirement for digital services in many countries and is cheap only when built in from the first screen. Copy rules (if any) are enforced by a script, because a written rule alone does not stop a model from adding characters it likes. -->
 
 ## Conventions
 <!-- CUSTOMIZE: patterns the code already follows (or will follow). Describe what is, not an ideal. -->
