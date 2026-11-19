@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-labelledby="t d">
+  <title id="t">The agentic feature cycle</title>
+  <desc id="d">Ten steps in three stages, Define, Build and Ship, with guardrails that always run underneath.</desc>
+  <style>
+    :root { --bg:#ffffff; --panel:#f5f6f8; --line:#d6d9df; --text:#14171c; --muted:#5b6270; --accent:#c15f3c; --accent-soft:#f6e3db; --chip:#ffffff; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --panel:#161b22; --line:#30363d; --text:#e6edf3; --muted:#9198a1; --accent:#e07a52; --accent-soft:#3a2219; --chip:#0d1117; }
+    }
+    .bg { fill: var(--bg); }
+    .panel { fill: var(--panel); stroke: var(--line); }
+    .step { fill: var(--chip); stroke: var(--line); }
+    .num { fill: var(--accent); }
+    .numt { fill: #fff; font: 700 13px system-ui, -apple-system, Segoe UI, sans-serif; }
+    .h { fill: var(--text); font: 700 16px system-ui, -apple-system, Segoe UI, sans-serif; letter-spacing: .02em; }
+    .title { fill: var(--text); font: 700 20px system-ui, -apple-system, Segoe UI, sans-serif; }
+    .s { fill: var(--text); font: 600 14px system-ui, -apple-system, Segoe UI, sans-serif; }
+    .c { fill: var(--muted); font: 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .m { fill: var(--muted); font: 12.5px system-ui, -apple-system, Segoe UI, sans-serif; }
+    .arrow { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+    .head { fill: var(--accent); }
+    .band { fill: var(--accent-soft); stroke: var(--accent); stroke-opacity: .35; }
+    .chip { fill: var(--chip); stroke: var(--line); }
+    .ct { fill: var(--text); font: 13px system-ui, -apple-system, Segoe UI, sans-serif; }
+  </style>
+  <rect class="bg" width="960" height="600" rx="16"/>
+  <text class="title" x="24" y="40">The feature cycle</text>
+  <text class="m" x="210" y="40">each step: a fresh session, one role, one output file</text>
+
+  <!-- panels -->
+  <g>
+    <rect class="panel" x="20" y="60" width="290" height="340" rx="14"/>
+    <text class="h" x="40" y="88">DEFINE</text>
+    <rect class="panel" x="335" y="60" width="290" height="340" rx="14"/>
+    <text class="h" x="355" y="88">BUILD</text>
+    <rect class="panel" x="650" y="60" width="290" height="340" rx="14"/>
+    <text class="h" x="670" y="88">SHIP</text>
+  </g>
+
+  <!-- arrows between panels -->
+  <path class="arrow" d="M312 230 H329"/><path class="head" d="M333 230 l-9 -6 v12 z"/>
+  <path class="arrow" d="M627 230 H644"/><path class="head" d="M648 230 l-9 -6 v12 z"/>
+
+  <!-- DEFINE steps -->
+  <g transform="translate(36,104)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">1</text>
+    <text class="s" x="48" y="27">Spec</text><text class="c" x="48" y="46">/product</text>
+  </g>
+  <g transform="translate(36,178)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">2</text>
+    <text class="s" x="48" y="27">E2E tests first (they fail)</text><text class="c" x="48" y="46">/qa phase 1</text>
+  </g>
+  <g transform="translate(36,252)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">3</text>
+    <text class="s" x="48" y="27">Plan, written to a file</text><text class="c" x="48" y="46">/dev plan · Opus</text>
+  </g>
+  <g transform="translate(36,326)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">4</text>
+    <text class="s" x="48" y="27">Plan review</text><text class="c" x="48" y="46">plan-reviewer · Opus</text>
+  </g>
+
+  <!-- BUILD steps -->
+  <g transform="translate(351,104)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">5</text>
+    <text class="s" x="48" y="27">Implement + unit tests</text><text class="c" x="48" y="46">/dev implement</text>
+  </g>
+  <g transform="translate(351,178)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">6</text>
+    <text class="s" x="48" y="27">Commit</text><text class="m" x="48" y="46">docs update themselves</text>
+  </g>
+  <g transform="translate(351,252)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">7</text>
+    <text class="s" x="48" y="27">Code + security review</text><text class="c" x="48" y="46">code- / security-reviewer</text>
+  </g>
+  <g transform="translate(351,326)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">8</text>
+    <text class="s" x="48" y="27">Fix what's real</text><text class="m" x="48" y="46">Critical and Major findings</text>
+  </g>
+
+  <!-- SHIP steps -->
+  <g transform="translate(666,104)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">9</text>
+    <text class="s" x="48" y="27">Verify against the spec</text><text class="c" x="48" y="46">/qa · desktop + mobile</text>
+  </g>
+  <g transform="translate(666,178)">
+    <rect class="step" width="258" height="62" rx="10"/><circle class="num" cx="24" cy="31" r="13"/><text class="numt" x="24" y="35.5" text-anchor="middle">10</text>
+    <text class="s" x="48" y="27">Push + deploy</text><text class="m" x="48" y="46">only with your approval, CI green</text>
+  </g>
+  <g transform="translate(666,252)">
+    <rect class="step" width="258" height="136" rx="10" stroke-dasharray="4 4"/>
+    <text class="s" x="18" y="28">Any step: /handoff</text>
+    <text class="m" x="18" y="50">A short report to forward</text>
+    <text class="m" x="18" y="68">for an outside review.</text>
+    <text class="s" x="18" y="100">One time: /agentic-init</text>
+    <text class="m" x="18" y="122">Fills CLAUDE.md from a stack profile.</text>
+  </g>
+
+  <!-- guardrails band -->
+  <rect class="band" x="20" y="420" width="920" height="160" rx="14"/>
+  <text class="h" x="40" y="450">ALWAYS ON: HOOKS AND CI</text>
+  <text class="m" x="290" y="450">deterministic, so they run even when the model forgets</text>
+  <g>
+    <rect class="chip" x="40" y="468" width="282" height="40" rx="20"/><text class="ct" x="181" y="493" text-anchor="middle">.env, keys and service accounts blocked</text>
+    <rect class="chip" x="334" y="468" width="292" height="40" rx="20"/><text class="ct" x="480" y="493" text-anchor="middle">Docs + feature index after every commit</text>
+    <rect class="chip" x="638" y="468" width="282" height="40" rx="20"/><text class="ct" x="779" y="493" text-anchor="middle">Deploy and force-push denied</text>
+    <rect class="chip" x="40" y="520" width="282" height="40" rx="20"/><text class="ct" x="181" y="545" text-anchor="middle">Prettier on every edit</text>
+    <rect class="chip" x="334" y="520" width="292" height="40" rx="20"/><text class="ct" x="480" y="545" text-anchor="middle">Copy rules (optional) after edit + commit</text>
+    <rect class="chip" x="638" y="520" width="282" height="40" rx="20"/><text class="ct" x="779" y="545" text-anchor="middle">CI: lint, tests, E2E, axe</text>
+  </g>
+</svg>

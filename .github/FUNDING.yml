@@ -1,0 +1,4 @@
+# Shows the "Sponsor" button on the repository page.
+github: [amirtat]
+# Add the Bit payment link when you have it, for example:
+# custom: ["https://<your-bit-payment-link>"]

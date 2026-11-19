@@ -4,6 +4,20 @@ A starting point for any new project built with [Claude Code](https://claude.com
 
 Clone it, run one setup command, answer a few questions, and the project has a filled-in `CLAUDE.md`, a test baseline (unit, integration, E2E on desktop and mobile, accessibility checks), CI, and self-maintaining docs.
 
+Free and open source (MIT). If it saves you time, a star helps others find it, and you can [support it](#support) if you like.
+
+<p align="center"><img src="assets/cycle.svg" alt="The feature cycle: Define (spec, E2E tests first, plan, plan review), Build (implement, commit with automatic docs, code and security review, fix), Ship (verify, push and deploy with approval), with hooks and CI always on underneath." width="100%"></p>
+
+## Quick start
+
+1. Click **Use this template** on GitHub, create your repository, and clone it.
+2. Run `npm install` (it also installs the git hooks).
+3. Open [Claude Code](https://claude.com/claude-code) in the project and run `/agentic-init`. Answer the questions.
+
+Then build your first feature with `/product <what you want>` and follow [`WORKFLOW.md`](WORKFLOW.md). Optional, once per machine: `node global/install-global.mjs` blocks access to secret files in every project.
+
+**Requirements:** Node.js 22 or later, git, and Claude Code. Each stack profile lists what else it needs (for example Docker for Supabase, Java for the Firebase emulators).
+
 ## What's inside
 
 ```
@@ -107,7 +121,16 @@ On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `s
 
 ## Credits
 
-Built during the course **AI for Developers with Claude Code**. The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted from the course's demo repository, [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+Built during the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education). The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted, with the author's permission, from the course's demo repository, [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+
+## Support
+
+The template is free and stays free. If it saved you time and you want to give something back, pay what you like:
+
+- [GitHub Sponsors](https://github.com/sponsors/amirtat)
+- Bit (Israel): <!-- TODO: add the Bit payment link --> link coming soon
+
+Stars, issues and pull requests help just as much.
 
 ## Contributing
 
