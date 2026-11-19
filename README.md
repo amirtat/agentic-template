@@ -121,7 +121,7 @@ On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `s
 
 ## Credits
 
-Built during the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education). The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted, with the author's permission, from the course's demo repository, [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+Built during the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education). The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted, with his permission, from the course's demo repository by [Nir Channes](https://www.linkedin.com/in/nirch/), [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
 
 ## Support
 
