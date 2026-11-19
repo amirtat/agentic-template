@@ -4,7 +4,7 @@ A starting point for any new project built with [Claude Code](https://claude.com
 
 Clone it, run one setup command, answer a few questions, and the project has a filled-in `CLAUDE.md`, a test baseline (unit, integration, E2E on desktop and mobile, accessibility checks), CI, and self-maintaining docs.
 
-Free and open source (MIT). If it saves you time, a star helps others find it, and you can [support it](#support) if you like.
+Free and open source (MIT). If it saves you time, a star helps others find it.
 
 <p align="center"><img src="assets/cycle.svg" alt="The feature cycle: Define (spec, E2E tests first, plan, plan review), Build (implement, commit with automatic docs, code and security review, fix), Ship (verify, push and deploy with approval), with hooks and CI always on underneath." width="100%"></p>
 
@@ -121,16 +121,18 @@ On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `s
 
 ## Credits
 
-Built during the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education). The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted, with his permission, from the course's demo repository by [Nir Channes](https://www.linkedin.com/in/nirch/), [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+This template started from the demo kit of the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education), by [Nir Channes](https://www.linkedin.com/in/nirch/), and is shared with his permission. From the course kit come the core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, the post-commit docs hook, and the shape of `CLAUDE.md`.
 
-## Support
+Added on top of it:
 
-The template is free and stays free. If it saved you time and you want to give something back, pay what you like:
-
-- [GitHub Sponsors](https://github.com/sponsors/amirtat)
-- Bit (Israel): <!-- TODO: add the Bit payment link --> link coming soon
-
-Stars, issues and pull requests help just as much.
+- `/agentic-init` with four stack profiles (static, Firebase, Supabase, Firebase + Postgres), including multi-tenant rules
+- The `security-reviewer` agent, and a docs check in `code-reviewer`
+- The feature index, maintained by the docs hook
+- Hooks that block secret files, format every edit and enforce copy rules; deny rules for deploy and force-push
+- CI, and a one-time global installer
+- Product rules for every app: mobile, any language and direction, accessibility with axe in E2E, optional PWA
+- The `/design-brief`, `/bootstrap-docs` and `/handoff` skills
+- Changes to the course skills: mobile in the UI contract and E2E, a single strings file, and copy rules
 
 ## Contributing
 
