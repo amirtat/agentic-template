@@ -22,7 +22,7 @@ For forms, landing pages and small tools. Data, if any, leaves the page through 
 ## CONVENTIONS
 - One HTML file per page; shared header and footer markup is copied consistently or injected by one small script.
 - JavaScript in ES modules, one module per concern (`form.js`, `validation.js`, `i18n.js`); no inline scripts except a tiny bootstrap.
-- All user-facing text in `site/i18n/he.js` (an exported object). Elements carry `data-i18n="key"` and `i18n.js` fills them, so the HTML holds keys, not copy.
+- All user-facing text in `site/i18n/<lang>.js` (an exported object; `<lang>` is the primary language's code). Elements carry `data-i18n="key"` and `i18n.js` fills them, so the HTML holds keys, not copy.
 - Forms validate on the client for UX, show inline errors, disable the submit button while sending, and show a clear success state.
 - Every form has a honeypot field (with a `name` browsers will not autofill) to stop simple bots.
 - No hardcoded colors or sizes; values live in `site/css/tokens.css`.
@@ -43,7 +43,7 @@ Not applicable to this profile. If the owner answers yes, stop and suggest the f
 `site/i18n/<lang>.js` per language; `i18n.js` picks the language from the URL or a toggle, fills `data-i18n` elements, and sets `lang` and `dir` on `<html>`. A new string is added to every language file in the same commit.
 
 ## Baseline
-- Create `site/index.html` (with `lang="he" dir="rtl"` and a viewport meta tag), `site/css/tokens.css`, `site/css/main.css`, `site/js/i18n.js`, `site/i18n/he.js`.
+- Create `site/index.html` (with the primary language's `lang` and `dir`, and a viewport meta tag), `site/css/tokens.css`, `site/css/main.css`, `site/js/i18n.js`, `site/i18n/<lang>.js`.
 - `npm i -D vitest @playwright/test eslint eslint-config-prettier prettier serve`; `dev` script: `serve site -l 5173`.
 - Smoke tests: one Vitest unit test, one E2E test.
 

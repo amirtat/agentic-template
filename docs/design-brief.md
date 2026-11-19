@@ -11,14 +11,14 @@ _3 to 5 short principles that settle design arguments._
 
 ## Layout
 - Mobile first: every screen is designed at 375px first, then widened.
-- RTL first: Hebrew, right to left; logical CSS properties only.
+- Language and direction: as set in `CLAUDE.md`; logical CSS properties only, so left-to-right and right-to-left both work.
 
 ## Components
 _Which shared components exist and when to use each._
 
 ## Copy tone
-- Hebrew, short, direct. Address the user consistently (choose one form and keep it).
-- No em dash in any text. Use a regular hyphen.
+- Short and direct, in the primary language. Address the user consistently (choose one form and keep it).
+- Follow the copy rules in `CLAUDE.md` (if any).
 
 ## States
 _Loading, empty, error and success: how each looks and what it says._

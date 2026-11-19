@@ -36,7 +36,7 @@ Config comes from `.env` (copy `.env.example`). Local work runs against a local 
 ### Client
 - One `src/services/*.js` file per data area, built on one shared Supabase client; components never call Supabase directly.
 - Pages in `src/pages/`, shared UI in `src/components/`, one PascalCase component per file.
-- All user-facing text in `src/i18n/he.json`, read through one `t()` helper.
+- All user-facing text in `src/i18n/<lang>.json` (the primary language's code, for example `en.json`), read through one `t()` helper.
 - No hardcoded colors or sizes; values live in `src/styles/tokens.css`.
 
 ## SECURITY_RULES

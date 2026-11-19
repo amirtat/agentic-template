@@ -4,7 +4,7 @@ Installed automatically by `npm install` (the `postinstall` script runs `git con
 
 | Hook | When | What |
 |---|---|---|
-| `pre-commit` | before each commit | `node scripts/check-copy.mjs --staged`: blocks an em dash in staged user-facing files. |
+| `pre-commit` | before each commit | `node scripts/check-copy.mjs --staged`: blocks staged user-facing files that break the rules in `copy-rules.json` (none by default). |
 | `post-commit` | after each commit | Starts `scripts/update-docs.sh` in the background: headless Claude updates `docs/` and `feature-index/index.yaml`. |
 
 The rest of this file describes the post-commit hook. It is adapted from the course example, github.com/nirch/demo-day-sdlc, with one addition: it also maintains `feature-index/index.yaml`.

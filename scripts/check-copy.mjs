@@ -1,5 +1,8 @@
 #!/usr/bin/env node
-// Fails when user-facing files contain a forbidden character (today: the em dash, U+2014).
+// Fails when user-facing files contain a character the project forbids.
+// The rules live in copy-rules.json at the repo root, for example:
+//   { "forbidden": [{ "char": "\u2014", "name": "em dash", "fix": "use a regular hyphen (-)" }] }
+// With no rules (the default), every check passes.
 //
 // Usage:
 //   node scripts/check-copy.mjs              scan SCAN_PATHS (CI, npm run check-copy)
@@ -14,12 +17,24 @@ import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, extname, relative, resolve, sep } from 'node:path';
 
+
 const SCAN_PATHS = ['src', 'site', 'public', 'functions/src', 'supabase/functions', 'index.html'];
 const EXTENSIONS = new Set(['.html', '.htm', '.js', '.jsx', '.mjs', '.ts', '.tsx', '.json', '.vue', '.svelte', '.css', '.yml', '.yaml']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', '.git', 'coverage', '.firebase', 'playwright-report', 'test-results']);
-const FORBIDDEN = [{ char: '\u2014', name: 'em dash', fix: 'use a regular hyphen (-)' }];
-
 const root = process.env.CLAUDE_PROJECT_DIR || process.cwd();
+
+function loadRules() {
+  const file = join(root, 'copy-rules.json');
+  if (!existsSync(file)) return [];
+  try {
+    const rules = JSON.parse(readFileSync(file, 'utf8')).forbidden || [];
+    return rules.filter((r) => r && typeof r.char === 'string' && r.char.length > 0);
+  } catch (e) {
+    console.error(`check-copy: cannot read copy-rules.json: ${e.message}`);
+    process.exit(1);
+  }
+}
+const FORBIDDEN = loadRules();
 
 function inScope(file) {
   const rel = relative(root, resolve(root, file)).split(sep).join('/');
@@ -76,6 +91,11 @@ function readStdin() {
 
 const args = process.argv.slice(2);
 
+if (FORBIDDEN.length === 0) {
+  if (args[0] !== '--hook') console.log('check-copy: no rules in copy-rules.json, nothing to check');
+  process.exit(0);
+}
+
 if (args[0] === '--hook') {
   let input = {};
   try {
@@ -87,7 +107,7 @@ if (args[0] === '--hook') {
   if (!file || !inScope(file)) process.exit(0);
   const issues = findIssues(file);
   if (issues.length) {
-    process.stderr.write(`User-facing text must not contain an em dash. Replace each one with a regular hyphen (-):\n${issues.join('\n')}\n`);
+    process.stderr.write(`User-facing text breaks the copy rules in copy-rules.json. Fix each one:\n${issues.join('\n')}\n`);
     process.exit(2);
   }
   process.exit(0);

@@ -1,6 +1,6 @@
 ---
 name: design-brief
-description: Interviews the owner about audience, brand, feel and reference sites, then writes docs/design-brief.md and a design tokens file. Mobile-first, RTL-first, no em dash. Use once when a project starts, or when the owner wants to change the visual direction. Does not change application code beyond the tokens file.
+description: Interviews the owner about audience, brand, feel and reference sites, then writes docs/design-brief.md and a design tokens file. Mobile-first, works in left-to-right and right-to-left, follows the project's copy rules. Use once when a project starts, or when the owner wants to change the visual direction. Does not change application code beyond the tokens file.
 disable-model-invocation: true
 ---
 
@@ -19,15 +19,15 @@ disable-model-invocation: true
    5. Anything to avoid.
    6. Density: data-heavy screens, or spacious and simple?
 3. **Write `docs/design-brief.md`** with the sections already in the template: Audience and feel, Principles (3 to 5 that settle arguments), Layout, Components, Copy tone, States, Tokens. Keep it under 120 lines.
-   - Layout always includes: designed at 375px first, then widened; RTL first with logical CSS properties; touch targets of at least 44px; a clearly visible focus style; nothing that relies on color alone.
-   - Copy tone always includes: Hebrew, one consistent form of address, no em dash (use a regular hyphen).
+   - Layout always includes: designed at 375px first, then widened; the language direction from `CLAUDE.md`, with logical CSS properties; touch targets of at least 44px; a clearly visible focus style; nothing that relies on color alone.
+   - Copy tone always includes: the primary language, one consistent form of address, and the copy rules from `CLAUDE.md` (if any).
    - States: what loading, empty, error and success look like and say.
 4. **Write the tokens file** at the path `CLAUDE.md` names for styling tokens (create it there if missing): colors with names by role (`--color-surface`, `--color-text`, `--color-primary`, `--color-danger` ...), font families, a type scale, spacing scale, radii, shadows. Include `--color-focus` for the focus ring. Check that text colors meet WCAG AA contrast (4.5:1, or 3:1 for large text) on their surfaces, and that the focus ring and input borders reach 3:1 against their background. Say which pairs you checked.
 5. **Report** both paths and the principles in one short list, and ask the owner to review and edit the brief by hand.
 
 ## Taste
 
-Aim for a distinctive, intentional look, not a generic template. As inspiration, follow the approach of Anthropic's open `frontend-design` skill (https://github.com/anthropics/skills/tree/main/skills/frontend-design): commit to a clear aesthetic direction, choose type deliberately, use a restrained palette with one strong accent, and avoid default-looking layouts. Hebrew fonts to consider: Heebo, Assistant, Rubik, Noto Sans Hebrew, Frank Ruhl Libre (for an editorial feel).
+Aim for a distinctive, intentional look, not a generic template. As inspiration, follow the approach of Anthropic's open `frontend-design` skill (https://github.com/anthropics/skills/tree/main/skills/frontend-design): commit to a clear aesthetic direction, choose type deliberately, use a restrained palette with one strong accent, and avoid default-looking layouts. Choose fonts that fully support the primary language's script; check the weights you need exist in it. For example, for Hebrew: Heebo, Assistant, Rubik, Noto Sans Hebrew, Frank Ruhl Libre (editorial); for Arabic: Noto Sans Arabic, IBM Plex Sans Arabic, Cairo.
 
 ## Do not
 
