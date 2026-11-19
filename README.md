@@ -11,8 +11,7 @@ Free and open source (MIT). If it saves you time, a star helps others find it.
 ## Quick start
 
 1. Click **Use this template** on GitHub, create your repository, and clone it.
-2. Run `npm install` (it also installs the git hooks).
-3. Open [Claude Code](https://claude.com/claude-code) in the project and run `/agentic-init`. Answer the questions.
+2. Open [Claude Code](https://claude.com/claude-code) in the project and run `/agentic-init`. Answer the questions. It sets up the stack and runs `npm install`, which also turns on the git hooks.
 
 Then build your first feature with `/product <what you want>` and follow [`WORKFLOW.md`](WORKFLOW.md). Optional, once per machine: `node global/install-global.mjs` blocks access to secret files in every project.
 
@@ -71,11 +70,14 @@ Adds the secret-file guard to `~/.claude/settings.json` for every project, and o
 ## New project
 
 1. On GitHub: **Use this template** -> new repository -> clone it.
-2. `npm install` (installs the git hooks through `postinstall`).
-3. In Claude Code: `/agentic-init`, and answer the questions.
-4. Review the changes and commit them on a branch.
-5. `/design-brief`.
-6. First feature: follow `WORKFLOW.md`.
+2. In Claude Code: `/agentic-init`, and answer the questions. It runs `npm install` at the end, which installs the git hooks.
+3. Review the changes and commit them on a branch.
+4. `/design-brief`.
+5. First feature: follow `WORKFLOW.md`.
+
+## Working on an existing clone
+
+When you clone a project that was already set up (a teammate, or you on another computer), run `npm install` first. It installs the app's dependencies and turns on the git hooks through the `postinstall` script (`git config core.hooksPath .githooks`). Git does not run hooks stored in a repository on its own, so without this step the copy check and the automatic docs update silently stop running.
 
 ## Project in a client's repository
 
@@ -102,7 +104,7 @@ git push -u origin main
 
 - The result is the same as "Use this template": one commit, no template history.
 - This is the only push that goes straight to `main`, because the repository is empty. From then on, work on branches.
-- Continue from step 2 of "New project".
+- Continue from step 2 of "New project". (If you commit before running `/agentic-init`, run `npm install` first so the git hooks are on.)
 - Agree with the client on who owns the tooling (`.claude/`, `.githooks/`, `scripts/`). This template is MIT licensed, so either way works.
 
 ## Existing project
