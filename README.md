@@ -4,6 +4,19 @@ A starting point for any new project built with [Claude Code](https://claude.com
 
 Clone it, run one setup command, answer a few questions, and the project has a filled-in `CLAUDE.md`, a test baseline (unit, integration, E2E on desktop and mobile, accessibility checks), CI, and self-maintaining docs.
 
+Free and open source (MIT). If it saves you time, a star helps others find it.
+
+<p align="center"><img src="assets/cycle.svg" alt="The feature cycle: Define (spec, E2E tests first, plan, plan review), Build (implement, commit with automatic docs, code and security review, fix), Ship (verify, push and deploy with approval), with hooks and CI always on underneath." width="100%"></p>
+
+## Quick start
+
+1. Click **Use this template** on GitHub, create your repository, and clone it.
+2. Open [Claude Code](https://claude.com/claude-code) in the project and run `/agentic-init`. Answer the questions. It sets up the stack and runs `npm install`, which also turns on the git hooks.
+
+Then build your first feature with `/product <what you want>` and follow [`WORKFLOW.md`](WORKFLOW.md). Optional, once per machine: `node global/install-global.mjs` blocks access to secret files in every project.
+
+**Requirements:** Node.js 22 or later, git, and Claude Code. Each stack profile lists what else it needs (for example Docker for Supabase, Java for the Firebase emulators).
+
 ## What's inside
 
 ```
@@ -57,11 +70,14 @@ Adds the secret-file guard to `~/.claude/settings.json` for every project, and o
 ## New project
 
 1. On GitHub: **Use this template** -> new repository -> clone it.
-2. `npm install` (installs the git hooks through `postinstall`).
-3. In Claude Code: `/agentic-init`, and answer the questions.
-4. Review the changes and commit them on a branch.
-5. `/design-brief`.
-6. First feature: follow `WORKFLOW.md`.
+2. In Claude Code: `/agentic-init`, and answer the questions. It runs `npm install` at the end, which installs the git hooks.
+3. Review the changes and commit them on a branch.
+4. `/design-brief`.
+5. First feature: follow `WORKFLOW.md`.
+
+## Working on an existing clone
+
+When you clone a project that was already set up (a teammate, or you on another computer), run `npm install` first. It installs the app's dependencies and turns on the git hooks through the `postinstall` script (`git config core.hooksPath .githooks`). Git does not run hooks stored in a repository on its own, so without this step the copy check and the automatic docs update silently stop running.
 
 ## Project in a client's repository
 
@@ -88,7 +104,7 @@ git push -u origin main
 
 - The result is the same as "Use this template": one commit, no template history.
 - This is the only push that goes straight to `main`, because the repository is empty. From then on, work on branches.
-- Continue from step 2 of "New project".
+- Continue from step 2 of "New project". (If you commit before running `/agentic-init`, run `npm install` first so the git hooks are on.)
 - Agree with the client on who owns the tooling (`.claude/`, `.githooks/`, `scripts/`). This template is MIT licensed, so either way works.
 
 ## Existing project
@@ -107,7 +123,18 @@ On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `s
 
 ## Credits
 
-Built during the course **AI for Developers with Claude Code**. The core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, and the post-commit docs hook are adapted from the course's demo repository, [nirch/demo-day-sdlc](https://github.com/nirch/demo-day-sdlc). Everything else (stack profiles, init, security reviewer, feature index, hooks, copy rules, accessibility, PWA) was added here.
+This template started from the demo kit of the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education), by [Nir Channes](https://www.linkedin.com/in/nirch/), and is shared with his permission. From the course kit come the core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, the post-commit docs hook, and the shape of `CLAUDE.md`.
+
+Added on top of it:
+
+- `/agentic-init` with four stack profiles (static, Firebase, Supabase, Firebase + Postgres), including multi-tenant rules
+- The `security-reviewer` agent, and a docs check in `code-reviewer`
+- The feature index, maintained by the docs hook
+- Hooks that block secret files, format every edit and enforce copy rules; deny rules for deploy and force-push
+- CI, and a one-time global installer
+- Product rules for every app: mobile, any language and direction, accessibility with axe in E2E, optional PWA
+- The `/design-brief`, `/bootstrap-docs` and `/handoff` skills
+- Changes to the course skills: mobile in the UI contract and E2E, a single strings file, and copy rules
 
 ## Contributing
 
