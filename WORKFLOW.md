@@ -10,7 +10,7 @@ Work on a feature branch. Every step ends with a commit. `<spec>` and `<plan>` a
 | 4 | Plan review | same session | Opus | `run the plan-reviewer on the plan`, then `apply the issues you agree with; do not re-run the reviewer` | Decide which issues to apply, commit |
 | 5 | Implement | `/clear` | Sonnet | `/dev implement @<plan>` | Read the diff |
 | 6 | Commit | - | - | commit (the message must not start with `docs:`) | Read the docs commit the hook adds |
-| 7 | Code review | `/clear` | Sonnet | `@code-reviewer last commit`; in sensitive areas also `@security-reviewer last commit` (runs on Opus) | Decide which findings are real |
+| 7 | Code review | `/clear` | Sonnet | `run code-reviewer on last commit`; in sensitive areas also `run security-reviewer on branch` (runs on Opus) | Decide which findings are real |
 | 8 | Fix | same session | Sonnet | `fix the Critical and Major items` | Separate commit |
 | 9 | Verify | `/clear` | Sonnet | `/qa @<spec> feature is fully implemented` | Commit the test report |
 | 10 | Push + deploy | - | - | push after your approval; CI deploys | Check the live site visually, on mobile too |
