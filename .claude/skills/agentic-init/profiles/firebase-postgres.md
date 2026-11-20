@@ -26,14 +26,14 @@ Ask these together with the main interview when this profile is chosen:
 | Hosting | Firebase Hosting, deployed by CI with Workload Identity Federation (no service-account keys) |
 
 ## COMMANDS
-Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgres), Java 21+ and `firebase-tools` (Auth, Functions and Hosting emulators).
+Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgres), Java 21+ and `firebase-tools` (Auth, Functions and Hosting emulators). On macOS, if `docker` is not found after installing Docker Desktop, add `$HOME/.docker/bin` to `PATH` in `~/.zshrc`.
 - Database (root): `npm run db:up` and `npm run db:down` (Docker Compose, Postgres 16 on port 5432).
 - Migrations (root): `npm run db:new -- <name>` creates a file; `npm run db:migrate` applies pending ones; `npm run db:reset` drops, recreates, migrates and loads `db/seed.sql`. Local database only.
 - Emulators (root): `npm run emulators` (Auth, Functions, Hosting).
 - App (root): `npm run dev` (Vite, port 5173; uses the emulators when `VITE_USE_EMULATORS=true`).
-- Unit (root): `npm test` (Vitest).
+- Unit (root): `npm test` (Vitest). The root Vitest config excludes `tests/db/`, `functions/` and `e2e/`, so each level runs only through its own command.
 - Database and RLS (root): `npm run test:db` (Vitest against the local Postgres, connected as the runtime role).
-- API (in `functions/`): `npm test` (Vitest + supertest against the local Postgres and the Auth emulator).
+- API (root): `npm run test:api`, which runs `firebase emulators:exec --only auth "npm --prefix functions test"` (Vitest + supertest against the local Postgres and the Auth emulator).
 - E2E (root): `npm run test:e2e` (Playwright; its `webServer` starts the emulators and Vite; run `npm run db:up` first and stop anything already on ports 5173, 5001, 9099, 5432).
 - Lint (root and `functions/`): `npm run lint`.
 - Deploy: CI only, on a green push to `main`. Migrations against Cloud SQL run only in the CI deploy job. Never run migrations, `psql`, the Cloud SQL Auth Proxy or `firebase deploy` against the cloud from a local machine.
@@ -48,7 +48,15 @@ Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgre
 - Multi-step writes run in one transaction.
 ### API
 - One Express app exported as `api` (`onRequest`, region and runtime options in `functions/src/config.js`). Routes in `functions/src/routes/`, one file per area.
-- Every route except `/api/health` goes through the auth middleware: it verifies the Identity Platform ID token with the Admin SDK, then loads the user, role and status from the database on every request, so a disabled user is blocked at once.
+- Every route except `/api/health` goes through the auth middleware. `/api/health` carries a comment that it is public on purpose and returns no data.
+- The auth middleware, in this order, with these statuses:
+  1. No token, or the Admin SDK rejects it: 401.
+  2. The token has no `firebase.tenant`: 403.
+  3. The tenant is unknown or not active: 403.
+  4. Once a users table exists: the user, role and status are loaded from the database on every request, so a disabled user is blocked at once. Unknown or disabled user: 403.
+  5. A database error in any of these steps: 500 with a generic message, logged without the token or personal data. Never turned into a 401.
+  <!-- Why: a catch-all that answers 401 hides a database outage as "signed out" and leaves nothing in the logs. -->
+- `express.json({ limit: '100kb' })`, or a smaller limit; larger bodies only on a route that needs them.
 - Tenant data is reached only through `withTenant(tenantId, async (client) => ...)`. It opens a transaction, runs `select set_config('app.tenant_id', $1, true)` (transaction-scoped, safe with pooling), runs the callback and commits. Route code never calls `pool.query` on tenant tables directly.
 - Validate every input with zod on the server. Parameterized queries only, never string-built SQL.
 - Return safe error messages with the right status; log details with `logger`, never personal data.
@@ -73,14 +81,18 @@ Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgre
 ## TEST_RULES
 - Unit tests: Vitest, next to the code as `*.test.js`, or in `tests/unit/`.
 - Database tests: `tests/db/`, Vitest against the local Postgres, connected as `app_runtime`. One file per table or policy touched, always including a cross-tenant denial case.
-- API tests: `functions/test/`, Vitest + supertest on the Express app, with tokens from the Auth emulator and the local Postgres.
+- API tests: `functions/test/`, Vitest + supertest on the Express app, with real ID tokens from the Auth emulator and the local Postgres, so RLS runs for real. Mock the database or the Admin SDK only for a path that cannot be produced otherwise (for example a database outage), and say so in the test name.
+  <!-- Why: an API test against a mocked database proves the code, not the policy. The tenant boundary lives in the policy. -->
+- Every route has at least one allowed test (the right role in the right tenant gets 200) next to its denied tests. A route that only has denied tests would pass even if it always refused.
 - E2E: Playwright in `e2e/`, projects `desktop` and `mobile`, against the emulators and the local Postgres with seeded invented data (`db/seed.sql`). SAML and OIDC cannot be emulated: E2E signs in Auth emulator users inside the right tenant, and enterprise SSO is checked by hand against a test identity provider before release.
 
 ## Multi-tenant
 - Identity Platform multi-tenancy: one identity tenant per customer. The `tenants` table maps `idp_tenant_id` to the internal `id`. The client sets `auth.tenantId` before sign-in, resolved from the tenant's sign-in URL.
-- Every tenant-owned table has `tenant_id uuid not null references tenants(id)` with an index, and policies `using (tenant_id = current_setting('app.tenant_id', true)::uuid)` with the same `with check`. With no tenant set, the setting is null and no rows match (fail closed).
+- Every tenant-owned table has `tenant_id uuid not null references tenants(id)` with an index, and policies `using (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)` with the same `with check`. With no tenant set, the setting is null or an empty string, `nullif` turns both into null, and no rows match (fail closed).
+  <!-- Why: on a pooled connection a transaction-scoped setting reverts to '' (not null) after its first use, and ''::uuid throws instead of matching nothing. -->
+- The `tenants` table has `active boolean not null default true`. `app_runtime` may only `select`, and a policy limits it to active tenants. Only `app_owner` (migrations) and platform-admin routes change tenants.
 - Platform-level tables (the tenants list, platform admins) have no `tenant_id`, are reached only by platform-admin routes, and give no path into tenant data unless a spec says so.
-- Adversarial tests: a user of tenant A gets zero rows from tenant B and cannot insert, update or delete there; a query with no tenant set returns zero rows; a token from tenant A cannot be used on a tenant B route.
+- Adversarial tests: a user of tenant A gets zero rows from tenant B and cannot insert, update or delete there; a query with no tenant set returns zero rows; a token from tenant A cannot be used on a tenant B route; `app_runtime` cannot see an inactive tenant, and its token gets 403.
 
 ## Multi-language
 All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (react-i18next). The root sets `lang` and `dir` from the active language. A new string is added to every language file in the same commit.
@@ -90,9 +102,15 @@ All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (
 - In `functions/`: `npm i express pg zod firebase-admin firebase-functions @google-cloud/cloud-sql-connector` and `npm i -D vitest supertest`.
 - `docker-compose.yml` with `postgres:16`, and `db/init/01-roles.sql` that creates `app_owner` and `app_runtime` with local, invented passwords (development only; the same file runs in CI). The database name and both local connection URLs go in `.env.example`.
 - dbmate settings in `package.json` scripts: migrations in `db/migrations`, `--no-dump-schema`, `DATABASE_URL` connecting as `app_owner`.
-- First migration: a platform `tenants` table and one tenant-owned table (for example `tenant_settings`), both with RLS enabled and forced, policies and grants to `app_runtime`.
+- First migration (created with `npm run db:new -- init`): a platform `tenants` table (with `active`) and one tenant-owned table (for example `tenant_settings`), both with RLS enabled and forced, policies and grants to `app_runtime` as in the Multi-tenant rules.
+- `firestore.rules` and `storage.rules` that deny all reads and writes, linked from `firebase.json`. They stay deny-all even though the app does not use Firestore or Storage from the client.
+- The auth middleware as described in Conventions. There is no users table yet, so it stops after the tenant check. Write both of these in a "Known gaps" section of `docs/architecture.md`: the user lookup arrives with the first users feature; and tokens are not checked for revocation (`verifyIdToken(token, true)`), which is acceptable once the per-request user status check exists.
 - `firebase.json`: Hosting rewrite `/api/**` to the `api` function in the chosen region, then the single-page fallback `**` to `/index.html`.
-- Smoke tests: one Vitest unit test; one database test (RLS enabled and forced on every `public` table, and a cross-tenant read returns zero rows); one API test (`GET /api/health` returns 200, `GET /api/me` without a token returns 401); one E2E test.
+- Smoke tests:
+  - Unit: one Vitest test.
+  - Database: RLS enabled and forced on every `public` table, and `app_runtime` owns none; cross-tenant select, insert, update and delete are denied; no tenant set returns zero rows; an inactive tenant is invisible to `app_runtime`.
+  - API: `GET /api/health` returns 200; `GET /api/me` returns 401 without a token, 403 for a token with no tenant, 403 for an unknown or inactive tenant, 200 for an active tenant, and 500 (not 401) when the database fails.
+  - E2E: one test.
 
 ## Owner setup
 One-time steps in Google Cloud that `/agentic-init` cannot do. List them in the final report as a checklist for the owner:
@@ -105,5 +123,5 @@ One-time steps in Google Cloud that `/agentic-init` cannot do. List them in the 
 ## CI
 - Add a `postgres:16` service container, run `db/init/01-roles.sql` with `psql`, then `npm run db:migrate`.
 - Add `actions/setup-java` (Java 21) before tests so the emulators can run.
-- Run lint, check-copy, unit, database, API and E2E tests.
+- Run lint, check-copy, unit (`npm test`), database (`npm run test:db`), API (`npm run test:api`) and E2E tests, each as its own step.
 - Deploy job (on `main` only, after tests): authenticate with `google-github-actions/auth` using Workload Identity Federation; start the Cloud SQL Auth Proxy; run `dbmate up` as `app_owner` with the password read from Secret Manager; then `firebase deploy --only hosting,functions`. Leave the job commented out until the owner finishes the Owner setup.
