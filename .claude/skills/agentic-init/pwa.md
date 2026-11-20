@@ -13,7 +13,7 @@ Add this line to "Product rules" in `CLAUDE.md`:
   - `workbox.globPatterns` for the built shell only (`**/*.{js,css,html,svg,png,woff2}`) and no `runtimeCaching` for the API.
   - `workbox.navigateFallbackDenylist: [/^\/api\//, /^\/__\//]`. The `/__/` paths are Firebase's own (including the sign-in handler `/__/auth/handler`); serving them from the cache breaks sign-in.
   - The manifest below.
-- **Manifest:** `name` and `short_name` in the primary language (from the strings file values), `lang` and `dir` of the primary language, `start_url: '/'`, `scope: '/'`, `display: 'standalone'`, `theme_color` and `background_color` matching the tokens file, and icons in `public/icons/`: 192px, 512px and a 512px `maskable`. Also a 180px `apple-touch-icon` linked from the root HTML, and a `theme-color` meta tag.
+- **Manifest:** one manifest only, defined in the `VitePWA` options; the plugin writes the file and links it. Do not also add `public/manifest.webmanifest` or a hand-written `<link rel="manifest">`. Fields: `name` and `short_name` in the primary language (from the strings file values), `lang` and `dir` of the primary language, `start_url: '/'`, `scope: '/'`, `display: 'standalone'`, `theme_color` and `background_color` matching the tokens file, and icons in `public/icons/`: 192px, 512px and a 512px `maskable`. Also a 180px `apple-touch-icon` linked from the root HTML, and a `theme-color` meta tag.
 - **Icons:** until the owner supplies a logo, create simple placeholder icons (the app's initials on the primary color) and list them as a to-do.
 - **Update prompt:** one small component using `useRegisterSW` from `virtual:pwa-register/react`, with its text in the strings file. It is keyboard reachable and announced to screen readers (a polite live region).
 - **Static profile:** a hand-written `site/manifest.webmanifest` with the same fields, and a small `site/sw.js` that precaches the shell under a versioned cache name and deletes old caches on activate. Register it from the main script.
@@ -22,6 +22,8 @@ Add this line to "Product rules" in `CLAUDE.md`:
 ## Tests
 - E2E, both projects: the root HTML links the manifest, and the manifest loads with the primary language's `lang` and `dir`, `display` `standalone`, and its icons.
 - The service worker does not run on the dev server. Add a Playwright project `pwa` (desktop only) with its own `webServer` running a production build and preview (`npm run build && npm run preview`). It checks that a service worker registers and that a request under `/api/` is not answered from the cache.
+- The `pwa` project is frontend only: no database, no emulators, and its tests never need a real API answer. Say so in a comment at the top of its spec file.
+- CI: a separate job `pwa` (build, preview, `npx playwright test --project=pwa`), and exclude that project from the main E2E run. Add a comment in `ci.yml` that the job is frontend only by design.
 
 ## Owner notes
 Add to the final report:

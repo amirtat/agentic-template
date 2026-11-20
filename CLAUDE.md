@@ -53,8 +53,9 @@ Work flows through skills, each with one job and one output file under `specs/fe
 - Start each skill in a fresh session (`/clear`), because every step reads the previous step's file. Two exceptions: plan review continues the plan session, and fixes continue the code-review session.
 - Do not use Claude Code's built-in Plan mode. `/dev` writes its plan to a file.
 - `plan-reviewer`: after `/dev` writes a plan, before it is approved. Returns approve or revise.
-- `code-reviewer`: after the implementation is committed. Usage: `@code-reviewer` followed by `pr <number>`, `commit <sha>`, `commit <name>` or `last commit`.
-- `security-reviewer`: same usage as `code-reviewer`. Run it on any change that touches auth, permissions, rules or policies, personal data, payments, or tenant boundaries.
+- `code-reviewer`: after the implementation is committed. Ask for it in plain words, naming the target: `run code-reviewer on last commit`. Targets: `last commit`, `commit <sha>`, `commit <name>`, `branch` (every commit since the branch left `main`) or `pr <number>`.
+- `security-reviewer`: same targets as `code-reviewer`. Run it on any change that touches auth, permissions, rules or policies, personal data, payments, or tenant boundaries. When the change spans more than one commit, review `branch` or the PR, not `last commit`.
+<!-- Why: agents are started by asking for them; an `@name` typed by hand is plain text. `last commit` sees one commit only, so a fix made in an earlier commit of the same change goes unreviewed. -->
 - `/handoff`: a short structured report the owner forwards for an outside review.
 <!-- Why: separate roles keep each step focused, and a reviewer with a fresh context catches what the author no longer sees. Keep process details in the skills and agents, not here. -->
 

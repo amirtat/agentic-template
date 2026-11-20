@@ -15,7 +15,7 @@ Free and open source (MIT). If it saves you time, a star helps others find it.
 
 Then build your first feature with `/product <what you want>` and follow [`WORKFLOW.md`](WORKFLOW.md). Optional, once per machine: `node global/install-global.mjs` blocks access to secret files in every project.
 
-**Requirements:** Node.js 22 or later, git, and Claude Code. Each stack profile lists what else it needs (for example Docker for Supabase, Java for the Firebase emulators).
+**Requirements:** Node.js 22 or later, git, and Claude Code. Each stack profile lists what else it needs (for example Docker for Supabase and Firebase + Postgres, Java for the Firebase emulators). On macOS, if `docker` is not found after installing Docker Desktop, add `$HOME/.docker/bin` to `PATH` in `~/.zshrc`.
 
 ## What's inside
 
@@ -67,6 +67,14 @@ node global/install-global.mjs
 
 Adds the secret-file guard to `~/.claude/settings.json` for every project, and on macOS a sound when Claude needs you (if you don't have one). It backs up the file first and is safe to run again.
 
+Also once per machine, so references to deleted branches are cleaned on every pull:
+
+```bash
+git config --global fetch.prune true
+```
+
+And once per repository on GitHub: Settings -> General -> Pull Requests -> **Automatically delete head branches**.
+
 ## New project
 
 1. On GitHub: **Use this template** -> new repository -> clone it.
@@ -106,6 +114,7 @@ git push -u origin main
 - This is the only push that goes straight to `main`, because the repository is empty. From then on, work on branches.
 - Continue from step 2 of "New project". (If you commit before running `/agentic-init`, run `npm install` first so the git hooks are on.)
 - Agree with the client on who owns the tooling (`.claude/`, `.githooks/`, `scripts/`). This template is MIT licensed, so either way works.
+- On GitHub's free plan, a private repository has no branch protection rules and no CodeQL code scanning. The rule "never push to `main` without approval" is then enforced only by the hooks and by you. For code scanning on a free private repository, Semgrep in CI is a free alternative.
 
 ## Existing project
 

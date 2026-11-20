@@ -63,7 +63,7 @@ Config comes from `.env` (copy `.env.example`). Local work runs against the Fire
 All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (react-i18next). The root sets `lang` and `dir` from the active language. A new string is added to every language file in the same commit.
 
 ## Baseline
-- Scaffold (new project only): `npm create vite@latest . -- --template react`, then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test @firebase/rules-unit-testing firebase-tools eslint eslint-config-prettier prettier`, and `firebase init` for Firestore, Functions, Storage, Hosting and Emulators (ask the owner for the Firebase project id; use a placeholder until then).
+- Scaffold (new project only): `npm create vite@latest <temp-folder> -- --template react` (outside the repo, then merged in; see the init steps), then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test @firebase/rules-unit-testing firebase-tools eslint eslint-config-prettier prettier`, and `firebase init` for Firestore, Functions, Storage, Hosting and Emulators (ask the owner for the Firebase project id; until then use `demo-<project-name>`).
 - `firestore.rules` and `storage.rules` start as deny-all.
 - Smoke tests: one Vitest unit test, one rules test (an unauthenticated read is denied), one E2E test.
 
