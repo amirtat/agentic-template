@@ -86,7 +86,7 @@ Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgre
 All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (react-i18next). The root sets `lang` and `dir` from the active language. A new string is added to every language file in the same commit.
 
 ## Baseline
-- Scaffold (new project only): `npm create vite@latest . -- --template react`, then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test firebase-tools dbmate pg eslint eslint-config-prettier prettier`, and `firebase init` for Functions, Hosting and Emulators (Auth, Functions, Hosting). Do not enable Firestore. Ask the owner for the Firebase project id; use a placeholder until then.
+- Scaffold (new project only): `npm create vite@latest <temp-folder> -- --template react` (outside the repo, then merged in; see the init steps), then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test firebase-tools dbmate pg eslint eslint-config-prettier prettier`, and `firebase init` for Functions, Hosting and Emulators (Auth, Functions, Hosting). Do not enable Firestore. Ask the owner for the Firebase project id; until then use `demo-<project-name>`.
 - In `functions/`: `npm i express pg zod firebase-admin firebase-functions @google-cloud/cloud-sql-connector` and `npm i -D vitest supertest`.
 - `docker-compose.yml` with `postgres:16`, and `db/init/01-roles.sql` that creates `app_owner` and `app_runtime` with local, invented passwords (development only; the same file runs in CI). The database name and both local connection URLs go in `.env.example`.
 - dbmate settings in `package.json` scripts: migrations in `db/migrations`, `--no-dump-schema`, `DATABASE_URL` connecting as `app_owner`.

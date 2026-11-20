@@ -36,6 +36,10 @@ Turns the template into this project's setup. Profiles live next to this file in
    - Public-facing, where local law asks for one (for example Israel, and the public sector in the European Union and the United Kingdom) -> add to Product rules: "**Accessibility statement.** A page with the accessibility statement is linked from the footer of every page. Its content comes from the owner."
    Delete the `TEMPLATE:` comment at the top of `CLAUDE.md`. Leave no `{{` placeholder behind. Delete any profile text that does not apply.
 4. **Scaffold the baseline** as the profile's "Baseline" section describes. If the repo has no application code, scaffold the minimal app with the official tool named in the profile; show the command and ask before running it. Always:
+   - **Never scaffold over the template.** The repo already has `package.json`, `.gitignore` and `README.md`, and a scaffolder like `npm create vite` overwrites them. Run it in a temporary folder outside the repo, copy in the app files, and merge `package.json` (keep the template's scripts, add the scaffold's dependencies and scripts) and `.gitignore` (keep every template line, add the scaffold's). Keep the template's `README.md`. Delete the temporary folder.
+   - **Placeholder Firebase project id:** `demo-<project-name>`. The emulators treat any id that starts with `demo-` as offline and never reach a real project.
+   - **Migration files** are created with the profile's "new migration" command, so the timestamp in the name is the real current time. Never type a migration file name by hand.
+   - **Tailwind** (profiles that list it): Tailwind 4 with `npm i -D tailwindcss @tailwindcss/vite`, the `tailwindcss()` plugin in `vite.config.js`, and `@import "tailwindcss";` at the top of `src/index.css`. No `tailwind.config.js` and no PostCSS config; theme values come from the tokens file.
    - `package.json` keeps `"postinstall": "git config core.hooksPath .githooks || true"` and the `check-copy` script, and gains `lint`, `format` (`prettier --write .`), `test`, `test:e2e` scripts.
    - Prettier is installed (the `format-on-edit` hook formats each file Claude edits with it) with a `.prettierrc` of `{ "singleQuote": true, "printWidth": 100 }` and a `.prettierignore` that skips `dist`, `coverage`, `docs`, `specs` and lock files. ESLint uses `eslint-config-prettier` so the two never fight.
    - `playwright.config` has two projects, `desktop` and `mobile` (a phone device profile), and a `webServer` that starts the app.
@@ -48,7 +52,7 @@ Turns the template into this project's setup. Profiles live next to this file in
    - `scripts/check-copy.mjs`: set `SCAN_PATHS` to the profile's source folders.
 5. **Verify.** Run `npm install` (this also installs the git hooks), then lint, `npm run check-copy`, unit, integration and E2E. Fix setup problems. Report exact results; anything that cannot run here (for example an emulator that is not installed) is reported with the reason and the command to run it.
 6. **Report** what was filled and scaffolded, the check results, and the next steps:
-   1. Review the changes, then commit on a branch: `chore: initialize agentic setup`.
+   1. Review the changes, then commit on a branch: `chore: initialize agentic setup`. If the profile has a server, rules or policies, run `security-reviewer` on `branch` before merging.
    2. Run `/design-brief`.
    3. Existing code only: run `/bootstrap-docs`.
    4. First feature: `/product <feature>`.
