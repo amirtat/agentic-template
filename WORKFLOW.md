@@ -1,6 +1,6 @@
 # The feature cycle
 
-Work on a feature branch. Every step ends with a commit. `<spec>` and `<plan>` are the paths `/product` and `/dev` create under `specs/features/`.
+Work on a feature branch. `/product` starts it from an updated `main`. Every step ends with a commit. `<spec>` and `<plan>` are the paths `/product` and `/dev` create under `specs/features/`.
 
 | # | Step | Session | Model | Command in Claude Code | What you do |
 | --- | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Work on a feature branch. Every step ends with a commit. `<spec>` and `<plan>` a
 | 7 | Code review | `/clear` | Sonnet | `run code-reviewer on last commit`; in sensitive areas also `run security-reviewer on branch` (runs on Opus) | Decide which findings are real |
 | 8 | Fix | same session | Sonnet | `fix the Critical and Major items` | Separate commit |
 | 9 | Verify | `/clear` | Sonnet | `/qa @<spec> feature is fully implemented` | Commit the test report |
-| 10 | Push + deploy | - | - | push after your approval; CI deploys | Check the live site visually, on mobile too |
+| 10 | Push + deploy | - | - | push after your approval, open a PR, merge when CI is green; CI deploys | Check the live site visually, on mobile too |
 
 At the end of any step you can run `/handoff` and forward the report for an outside review.
 
@@ -26,3 +26,4 @@ At the end of any step you can run `/handoff` and forward the report for an outs
 - **Agent stuck or wrong:** read the file it wrote, fix the spec or the plan, and run the step again. Don't fix a wrong plan inside the code.
 - **Going back a step:** `git reset --hard <commit>`, only on the feature branch.
 - **The docs hook did nothing:** `tail -f .git/update-docs.log`.
+- **After a merge on GitHub:** `git checkout main && git pull`. The next `/product` does this for you if you forget. After a squash merge, delete the old local branch with `git branch -D <branch>`; Git does not see it as merged.

@@ -67,6 +67,14 @@ node global/install-global.mjs
 
 Adds the secret-file guard to `~/.claude/settings.json` for every project, and on macOS a sound when Claude needs you (if you don't have one). It backs up the file first and is safe to run again.
 
+Also once per machine, so references to deleted branches are cleaned on every pull:
+
+```bash
+git config --global fetch.prune true
+```
+
+And once per repository on GitHub: Settings -> General -> Pull Requests -> **Automatically delete head branches**.
+
 ## New project
 
 1. On GitHub: **Use this template** -> new repository -> clone it.

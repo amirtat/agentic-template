@@ -10,6 +10,11 @@ Input: a feature request from the user. Output: one spec file at
 
 ## Steps
 
+0. **Start the feature branch.** Run `git branch --show-current` and `git status --porcelain`.
+   - On `main` with a clean working tree: `git pull --ff-only`, then `git checkout -b feat/<kebab-case-name>` (the same name as the spec file).
+   - On `main` with uncommitted changes, or if the pull fails: stop and report. Do not stash, reset or merge.
+   - Already on another branch: ask whether this feature continues there or starts fresh from `main`.
+   <!-- Why: `main` on this machine does not update itself after a merge on GitHub. A branch cut from a stale `main` lacks the last merged work and conflicts later. -->
 1. **Read the ground truth.** `CLAUDE.md`, `docs/README.md`, `feature-index/index.yaml`, the relevant `docs/flows/*.md`, and `docs/design-brief.md`.
    <!-- Why: the flows describe current behavior and the brief sets copy and states. A spec written without them contradicts the app or invents UI. -->
 2. **Check the real code** (routes, pages, components, API endpoints or functions, the strings file) wherever the spec will name a route, label, heading or message. Use the feature index to find them.
