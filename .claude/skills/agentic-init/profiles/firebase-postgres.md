@@ -26,14 +26,14 @@ Ask these together with the main interview when this profile is chosen:
 | Hosting | Firebase Hosting, deployed by CI with Workload Identity Federation (no service-account keys) |
 
 ## COMMANDS
-Config comes from `.env` (copy `.env.example`). Local work needs Docker (Postgres), Java 21+ and `firebase-tools` (Auth, Functions and Hosting emulators). On macOS, if `docker` is not found after installing Docker Desktop, add `$HOME/.docker/bin` to `PATH` in `~/.zshrc`.
+Config comes from `.env`. First time on a machine: `cp .env.example .env`, then `npm run db:up`. Local work needs Docker (Postgres), Java 21+ and `firebase-tools` (Auth, Functions and Hosting emulators). On macOS, if `docker` is not found after installing Docker Desktop, add `$HOME/.docker/bin` to `PATH` in `~/.zshrc`.
 - Database (root): `npm run db:up` and `npm run db:down` (Docker Compose, Postgres 16 on port 5432).
 - Migrations (root): `npm run db:new -- <name>` creates a file; `npm run db:migrate` applies pending ones; `npm run db:reset` drops, recreates, migrates and loads `db/seed.sql`. Local database only.
-- Emulators (root): `npm run emulators` (Auth, Functions, Hosting).
+- Emulators (root): `npm run emulators` (Auth, Functions, Hosting), always with `--project demo-<project-name>`; `.firebaserc` is the deploy target only.
 - App (root): `npm run dev` (Vite, port 5173; uses the emulators when `VITE_USE_EMULATORS=true`).
 - Unit (root): `npm test` (Vitest). The root Vitest config excludes `tests/db/`, `functions/` and `e2e/`, so each level runs only through its own command.
 - Database and RLS (root): `npm run test:db` (Vitest against the local Postgres, connected as the runtime role).
-- API (root): `npm run test:api`, which runs `firebase emulators:exec --only auth "npm --prefix functions test"` (Vitest + supertest against the local Postgres and the Auth emulator).
+- API (root): `npm run test:api`, which runs `firebase emulators:exec --only auth --project demo-<project-name> "npm --prefix functions test"` (Vitest + supertest against the local Postgres and the Auth emulator).
 - E2E (root): `npm run test:e2e` (Playwright; its `webServer` starts the emulators and Vite; run `npm run db:up` first and stop anything already on ports 5173, 5001, 9099, 5432).
 - Lint (root and `functions/`): `npm run lint`.
 - Deploy: CI only, on a green push to `main`. Migrations against Cloud SQL run only in the CI deploy job. Never run migrations, `psql`, the Cloud SQL Auth Proxy or `firebase deploy` against the cloud from a local machine.
@@ -114,6 +114,7 @@ All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (
 
 ## Owner setup
 One-time steps in Google Cloud that `/agentic-init` cannot do. List them in the final report as a checklist for the owner:
+0. If the project belongs to the client's Google Workspace organization and the developer uses an outside account, the organization policy blocks adding them (`Domain Restricted Sharing`). See "Project in a client's repository" in the template README for the per-project override.
 1. Upgrade the Firebase project to Identity Platform; enable multi-tenancy if the app is multi-tenant.
 2. Create the Cloud SQL for PostgreSQL 16 instance in the chosen region, the database, and the `app_owner` and `app_runtime` roles with strong passwords.
 3. Store both passwords in Secret Manager and give the functions' service account access to the runtime one only.
