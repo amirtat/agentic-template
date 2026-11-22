@@ -1,6 +1,7 @@
 ---
 name: handoff
 description: Writes a short structured status report of the current SDLC step for the owner to forward to an outside reviewer (another AI session, a teammate or a client). Covers the step, files and commits, check results, decisions needed and open risks. Use at the end of any step when the user asks for a handoff or summary for review.
+model: sonnet
 ---
 
 # Handoff report
@@ -38,7 +39,7 @@ Branch: <branch>   Last commit: <sha> <subject>
 - <risk or open item, or "none">
 
 ### Next step
-<the exact next command, e.g. /dev implement @specs/features/<prefix>.plan.md>
+<the exact next command, e.g. /dev @specs/features/<prefix>.plan.md>
 ```
 
 ## Rules

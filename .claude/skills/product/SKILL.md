@@ -1,6 +1,7 @@
 ---
 name: product
 description: Turns a feature request into a written spec (summary, user stories, numbered acceptance criteria, UI contract including mobile, out of scope, open questions) saved in specs/features/. Use when the user describes a new feature or change and wants requirements before any planning or code. Writes no code and no tests.
+model: sonnet
 ---
 
 # Product: feature request to spec

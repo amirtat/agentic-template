@@ -1,6 +1,7 @@
 ---
 name: qa
 description: Verifies a feature against its spec in specs/features/. Before implementation, writes Playwright E2E tests (desktop and mobile) from the acceptance criteria and UI contract and confirms they fail because the feature is missing. After implementation, runs unit, integration and E2E tests plus the copy check and writes a short test report. Use for test-first E2E authoring or final verification. Does not modify application code or commit.
+model: sonnet
 ---
 
 # QA: spec to E2E tests to verification

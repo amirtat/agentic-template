@@ -28,7 +28,7 @@ feature-index/index.yaml       Feature -> files, data, docs (navigation for the 
 specs/features/                Spec, plan and test report for each feature
 .claude/settings.json          Hooks + deny rules (secrets, deploy, force push)
 .claude/hooks/                 protect-files, format-on-edit, optional long-file guard
-.claude/skills/                agentic-init, product, dev, qa, design-brief, bootstrap-docs, handoff
+.claude/skills/                agentic-init, product, architect, dev, qa, design-brief, bootstrap-docs, handoff
 .claude/agents/                plan-reviewer (Opus), code-reviewer, security-reviewer (Opus)
 .githooks/                     pre-commit (copy rules), post-commit (updates docs + feature index)
 scripts/                       check-copy.mjs, update-docs.sh
@@ -43,7 +43,8 @@ global/install-global.mjs      One-time setup for ~/.claude on your machine
 | `/agentic-init` | One-time setup: interviews you (product, roles, stack, languages, tenancy, accessibility law, PWA) and fills `CLAUDE.md` from a stack profile. Profiles: `static`, `firebase`, `supabase`, `firebase-postgres`. |
 | `/product` | Feature request to spec: user stories, numbered acceptance criteria, UI contract (including mobile). |
 | `/qa` | Writes Playwright E2E tests from the spec **before** the code exists, then verifies the finished feature. |
-| `/dev` | Writes a plan to a file and stops for approval; then implements it with unit and integration tests. |
+| `/architect` | Writes the implementation plan to a file and stops for approval; revises it after plan review. Runs on Opus. |
+| `/dev` | Implements an approved plan with unit and integration tests. Runs on Sonnet. |
 | `/design-brief` | Interviews you and writes the visual direction and a design tokens file. |
 | `/bootstrap-docs` | One-time docs for an existing codebase, using parallel explore subagents. |
 | `/handoff` | A short structured report to forward to an outside reviewer. |
@@ -132,7 +133,7 @@ On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `s
 
 ## Credits
 
-This template started from the demo kit of the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education), by [Nir Channes](https://www.linkedin.com/in/nirch/), and is shared with his permission. From the course kit come the core of the `product`, `dev` and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, the post-commit docs hook, and the shape of `CLAUDE.md`.
+This template started from the demo kit of the course **AI for Developers with Claude Code** at [Elevation](https://elevation.education), by [Nir Channes](https://www.linkedin.com/in/nirch/), and is shared with his permission. From the course kit come the core of the `product`, `dev` (now split into `architect` and `dev`) and `qa` skills, the `plan-reviewer` and `code-reviewer` agents, the post-commit docs hook, and the shape of `CLAUDE.md`.
 
 Added on top of it:
 
@@ -144,6 +145,7 @@ Added on top of it:
 - Product rules for every app: mobile, any language and direction, accessibility with axe in E2E, optional PWA
 - The `/design-brief`, `/bootstrap-docs` and `/handoff` skills
 - Changes to the course skills: mobile in the UI contract and E2E, a single strings file, and copy rules
+- Planning split from implementation (`/architect` on Opus, `/dev` on Sonnet), with a model set per skill and agent
 
 ## Contributing
 
