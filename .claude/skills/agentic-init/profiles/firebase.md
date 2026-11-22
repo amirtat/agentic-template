@@ -15,9 +15,9 @@
 | Hosting | Firebase Hosting, deployed by CI |
 
 ## COMMANDS
-Config comes from `.env` (copy `.env.example`). Local work runs against the Firebase Emulator Suite (needs Java 21+ and `firebase-tools`).
+Config comes from `.env`. First time on a machine: `cp .env.example .env`. Local work runs against the Firebase Emulator Suite (needs Java 21+ and `firebase-tools`).
 - App (root): `npm run dev` (Vite, port 5173, talks to the emulators when `VITE_USE_EMULATORS=true`).
-- Emulators (root): `npm run emulators`.
+- Emulators (root): `npm run emulators`, always with `--project demo-<project-name>`; `.firebaserc` is the deploy target only.
 - Unit (root): `npm test` (Vitest).
 - Rules (root): `npm run test:rules` (starts the Firestore and Storage emulators and runs `tests/rules`).
 - Functions (in `functions/`): `npm test` (runs against the emulators).

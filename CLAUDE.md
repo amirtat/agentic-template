@@ -22,7 +22,7 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 ## Working rules
 - **Map first.** Before a risky change (auth, permissions, data model, money, anything shared between tenants), read the real code paths and report what you found before proposing a change.
 - **Verify, don't assume.** Read the actual logs, data and code before naming a root cause.
-- **Stop and report** when something is unclear. Do not guess and continue.
+- **Stop and report** when something is unclear. Do not guess and continue. When an instruction says to stop and report, stop there: do not apply a fix in the same turn, even an obvious one.
 - **Never deploy and never push** without the owner's explicit approval in this session. CI must be green first.
 - **No secrets in code.** Config and secrets come from `.env`; add every new variable to `.env.example` with a placeholder.
 - Before navigating the codebase, read `feature-index/index.yaml` and open only the files listed for the feature at hand.

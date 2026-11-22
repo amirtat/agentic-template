@@ -15,7 +15,7 @@
 | Hosting | Netlify or Vercel for the client, deployed by CI |
 
 ## COMMANDS
-Config comes from `.env` (copy `.env.example`). Local work runs against a local Supabase stack (needs Docker and the Supabase CLI).
+Config comes from `.env`. First time on a machine: `cp .env.example .env`. Local work runs against a local Supabase stack (needs Docker and the Supabase CLI).
 - Local stack (root): `npx supabase start` (prints the local URL and anon key) and `npx supabase stop`.
 - App (root): `npm run dev` (Vite, port 5173).
 - New migration (root): `npx supabase migration new <name>`, then `npx supabase db reset` to apply all migrations and the seed.

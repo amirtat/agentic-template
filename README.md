@@ -88,6 +88,8 @@ And once per repository on GitHub: Settings -> General -> Pull Requests -> **Aut
 
 When you clone a project that was already set up (a teammate, or you on another computer), run `npm install` first. It installs the app's dependencies and turns on the git hooks through the `postinstall` script (`git config core.hooksPath .githooks`). Git does not run hooks stored in a repository on its own, so without this step the copy check and the automatic docs update silently stop running.
 
+Then create your local config once: `cp .env.example .env` (the example holds local, invented development values). Profiles with a local database also need `npm run db:up` before the database tests.
+
 ## Project in a client's repository
 
 When the client must own the code, they create an **empty** repository in their GitHub organization and give you Admin access to it. "Use this template" does not work there, because you cannot create repositories in their organization.
@@ -115,6 +117,19 @@ git push -u origin main
 - This is the only push that goes straight to `main`, because the repository is empty. From then on, work on branches.
 - Continue from step 2 of "New project". (If you commit before running `/agentic-init`, run `npm install` first so the git hooks are on.)
 - Agree with the client on who owns the tooling (`.claude/`, `.githooks/`, `scripts/`). This template is MIT licensed, so either way works.
+- **Google Cloud in the client's organization.** When the client's Google account belongs to their Google Workspace, the organization policy usually blocks granting project roles to an outside address (`IAM policy update failed ... Domain Restricted Sharing`). The client's Workspace admin can lift it for this one project only, in Cloud Shell with the project selected:
+
+  ```bash
+  cat > policy.yaml <<'EOF'
+  name: projects/<project-id>/policies/iam.allowedPolicyMemberDomains
+  spec:
+    rules:
+    - allowAll: true
+  EOF
+  gcloud org-policies set-policy policy.yaml
+  ```
+
+  Newer organizations may also enforce `iam.managed.allowedPolicyMembers`; turn its enforcement off for the project the same way (Console: IAM & Admin -> Organization Policies -> the policy -> Manage policy -> Override parent's policy). Check both with `gcloud org-policies describe <policy> --project=<project-id> --effective`, then grant the roles with `gcloud projects add-iam-policy-binding`. The rest of the organization stays restricted.
 - On GitHub's free plan, a private repository has no branch protection rules and no CodeQL code scanning. The rule "never push to `main` without approval" is then enforced only by the hooks and by you. For code scanning on a free private repository, Semgrep in CI is a free alternative.
 
 ## Existing project
