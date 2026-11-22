@@ -49,10 +49,11 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 
 ## SDLC workflow
 Work flows through skills, each with one job and one output file under `specs/features/`:
-`/product` (spec) -> `/qa` phase 1 (E2E tests first) -> `/dev plan` (plan) -> `plan-reviewer` -> `/dev implement` -> commit -> `code-reviewer` (+ `security-reviewer`) -> fix -> `/qa` (verify) -> `/handoff`.
+`/product` (spec) -> `/qa` phase 1 (E2E tests first) -> `/architect` (plan) -> `plan-reviewer` -> `/architect revise` -> `/dev` (implement) -> commit -> `code-reviewer` (+ `security-reviewer`) -> fix -> `/qa` (verify) -> `/handoff`.
 - Start each skill in a fresh session (`/clear`), because every step reads the previous step's file. Two exceptions: plan review continues the plan session, and fixes continue the code-review session.
-- Do not use Claude Code's built-in Plan mode. `/dev` writes its plan to a file.
-- `plan-reviewer`: after `/dev` writes a plan, before it is approved. Returns approve or revise.
+- Do not use Claude Code's built-in Plan mode. `/architect` writes the plan to a file.
+- Each skill and agent sets its own model (`/architect`, `plan-reviewer` and `security-reviewer` on Opus, the rest on Sonnet). The setting lasts one turn, so keep the session default on Sonnet and run every planning turn through `/architect`, including answers and revisions.
+- `plan-reviewer`: after `/architect` writes a plan, before it is approved. Returns approve or revise.
 - `code-reviewer`: after the implementation is committed. Ask for it in plain words, naming the target: `run code-reviewer on last commit`. Targets: `last commit`, `commit <sha>`, `commit <name>`, `branch` (every commit since the branch left `main`) or `pr <number>`.
 - `security-reviewer`: same targets as `code-reviewer`. Run it on any change that touches auth, permissions, rules or policies, personal data, payments, or tenant boundaries. When the change spans more than one commit, review `branch` or the PR, not `last commit`.
 <!-- Why: agents are started by asking for them; an `@name` typed by hand is plain text. `last commit` sees one commit only, so a fix made in an earlier commit of the same change goes unreviewed. -->

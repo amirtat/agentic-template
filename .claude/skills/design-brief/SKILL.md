@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Design brief
 
-`docs/design-brief.md` is the project's visual direction. `/product` and `/dev` read it on every feature so the UI stays consistent. The owner owns it; the post-commit hook never edits it.
+`docs/design-brief.md` is the project's visual direction. `/product`, `/architect` and `/dev` read it on every feature so the UI stays consistent. The owner owns it; the post-commit hook never edits it.
 
 ## Steps
 

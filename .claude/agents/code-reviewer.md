@@ -2,6 +2,7 @@
 name: code-reviewer
 description: "Usage: `pr <number>` | `commit <sha>` | `commit <name>` | `last commit` | `branch`. With no argument it reviews uncommitted changes, otherwise the last commit. Reviews a diff for correctness, CLAUDE.md conventions and product rules, security, test coverage of the changed code, alignment with the plan, and whether the post-commit hook updated docs/ and feature-index/. Use after /dev has implemented and tested a feature and the implementation is committed, before /qa. Read-only; returns findings ranked by severity, starting with what was reviewed."
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 <!-- Why: Bash is here only so the reviewer can see the diff. The prompt below limits it to read-only git and gh commands. Everything else stays read-only because a reviewer that edits code hides what it changed. -->
 
