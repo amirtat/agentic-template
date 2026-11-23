@@ -59,6 +59,7 @@ Turns the template into this project's setup. Profiles live next to this file in
    3. Existing code only: run `/bootstrap-docs`.
    4. First feature: `/product <feature>`.
    5. If the profile has an "Owner setup" section: list its steps as a checklist for the owner.
+   6. If the profile commits a non-secret env file (for example `functions/.env.<project-id>`), add its exact path to `.claude/public-env-files` so the secret-file hook lets you write it.
    6. PWA: the "Owner notes" from `pwa.md` (real icons to supply, how users install). Public-facing: the owner writes the accessibility statement text.
 
 ## Do not

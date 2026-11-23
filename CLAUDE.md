@@ -43,7 +43,7 @@ Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` 
 ## Security and privacy
 <!-- CUSTOMIZE: /agentic-init fills the profile-specific list -->
 {{SECURITY_RULES}}
-- Never read, print or copy `.env`, key files or service-account files. A hook blocks this; do not work around it.
+- Never read, print or copy `.env`, key files or service-account files. A hook blocks this; do not work around it. The hook blocks only you: when a blocked file must be created or committed, give the owner the exact command and let them run it in their own terminal. Never suggest a bypass (there is no `git add --no-verify`). Env files that hold no secrets can be listed in `.claude/public-env-files`, with the owner's approval.
 - Personal data (names, phone numbers, ID numbers, emails) never goes into logs, test fixtures, docs or commit messages. Tests use invented data.
 <!-- Why: security rules are cheap to follow and expensive to fix after a leak. -->
 
