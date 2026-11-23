@@ -29,7 +29,7 @@ Ask these together with the main interview when this profile is chosen:
 Config comes from `.env`. First time on a machine: `cp .env.example .env`, then `npm run db:up`. Local work needs Docker (Postgres), Java 21+ and `firebase-tools` (Auth, Functions and Hosting emulators). On macOS, if `docker` is not found after installing Docker Desktop, add `$HOME/.docker/bin` to `PATH` in `~/.zshrc`.
 - Database (root): `npm run db:up` and `npm run db:down` (Docker Compose, Postgres 16 on port 5432).
 - Migrations (root): `npm run db:new -- <name>` creates a file; `npm run db:migrate` applies pending ones; `npm run db:reset` drops, recreates, migrates and loads `db/seed.sql`. Local database only.
-- Emulators (root): `npm run emulators` (Auth, Functions, Hosting), always with `--project demo-<project-name>`; `.firebaserc` is the deploy target only.
+- Emulators (root): `npm run emulators` (Auth, Functions, Hosting), always with `--project demo-<project-name>`; `.firebaserc` is the deploy target only. Secrets the function declares come from `functions/.secret.local` (git-ignored, local invented values, for example `DB_PASSWORD=`); without it the emulator tries the real Secret Manager and fails.
 - App (root): `npm run dev` (Vite, port 5173; uses the emulators when `VITE_USE_EMULATORS=true`).
 - Unit (root): `npm test` (Vitest). The root Vitest config excludes `tests/db/`, `functions/` and `e2e/`, so each level runs only through its own command.
 - Database and RLS (root): `npm run test:db` (Vitest against the local Postgres, connected as the runtime role).
@@ -60,7 +60,14 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 - Tenant data is reached only through `withTenant(tenantId, async (client) => ...)`. It opens a transaction, runs `select set_config('app.tenant_id', $1, true)` (transaction-scoped, safe with pooling), runs the callback and commits. Route code never calls `pool.query` on tenant tables directly.
 - Validate every input with zod on the server. Parameterized queries only, never string-built SQL.
 - Return safe error messages with the right status; log details with `logger`, never personal data.
-- Small connection pool per instance (`max` 5). The database password comes from Secret Manager (`defineSecret('DB_PASSWORD')`), never from code or committed config.
+- Small connection pool per instance (`max` 5). The database password comes from Secret Manager (`defineSecret('DB_PASSWORD')`, declared in the function's `secrets`), never from code or committed config.
+- `functions/src/db.js` picks the connection, failing closed:
+  1. `CLOUD_SQL_INSTANCE` set: the Cloud SQL connector (`@google-cloud/cloud-sql-connector`, public IP, password auth), user and database from `DB_USER` and `DB_NAME`, password from `DB_PASSWORD` at request time, not at module load. If `DB_USER` or `DB_NAME` is missing, throw an error that names it.
+  2. Otherwise `DATABASE_URL_RUNTIME` set: a plain `pg` Pool (local Docker and CI).
+  3. Neither: throw a clear error.
+  `getPool()` is async and memoizes one promise, so concurrent requests share one pool; on failure the promise is reset so the next request retries.
+- The function runs as its own service account (`app-api@<project-id>.iam.gserviceaccount.com`), set in `onRequest` options, never as the default compute account.
+- Non-secret cloud settings (`CLOUD_SQL_INSTANCE`, `DB_USER`, `DB_NAME`) live in `functions/.env.<project-id>`, which is committed (with a `!functions/.env.<project-id>` exception in `.gitignore`). Never create `functions/.env`: `firebase deploy` uploads it to every project.
 ### Client
 - One `src/services/*.js` file per data area, built on one `apiFetch` helper that adds the current ID token. Components never call `fetch` directly.
 - The client has no database credentials and does not use Firestore or Storage directly.
@@ -98,8 +105,10 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (react-i18next). The root sets `lang` and `dir` from the active language. A new string is added to every language file in the same commit.
 
 ## Baseline
-- Scaffold (new project only): `npm create vite@latest <temp-folder> -- --template react` (outside the repo, then merged in; see the init steps), then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test firebase-tools dbmate pg eslint eslint-config-prettier prettier`, and `firebase init` for Functions, Hosting and Emulators (Auth, Functions, Hosting). Do not enable Firestore. Ask the owner for the Firebase project id; until then use `demo-<project-name>`.
-- In `functions/`: `npm i express pg zod firebase-admin firebase-functions @google-cloud/cloud-sql-connector` and `npm i -D vitest supertest`.
+- Scaffold (new project only): `npm create vite@latest <temp-folder> -- --template react` (outside the repo, then merged in; see the init steps), then `npm i firebase react-router-dom`, `npm i -D vitest @playwright/test firebase-tools dbmate pg eslint eslint-config-prettier prettier` (`firebase-tools` pinned in the root `devDependencies`; scripts and CI run it as `npx firebase-tools`, never `npx firebase`, which resolves to the client SDK and has no executable), and `firebase init` for Functions, Hosting and Emulators (Auth, Functions, Hosting). Do not enable Firestore. Ask the owner for the Firebase project id; until then use `demo-<project-name>`.
+- In `functions/`: `npm i express pg zod firebase-admin firebase-functions @google-cloud/cloud-sql-connector` and `npm i -D vitest supertest`. `functions/package.json` has `"main"` pointing at the real entry file (for example `src/index.js`); Firebase does not find it otherwise, and Vitest never notices.
+- `db/cloud/roles.sql` from `profiles/firebase-postgres-roles.sql`, and `docs/deploy-setup.md` from `profiles/firebase-postgres-deploy.md` with the project id, project number, region, GitHub repository and developer email filled in (placeholders where still unknown).
+- `functions/.env.<project-id>` once the real project id is known (until then nothing: emulators run on the `demo-` id and do not load it).
 - `docker-compose.yml` with `postgres:16`, and `db/init/01-roles.sql` that creates `app_owner` and `app_runtime` with local, invented passwords (development only; the same file runs in CI). The database name and both local connection URLs go in `.env.example`.
 - dbmate settings in `package.json` scripts: migrations in `db/migrations`, `--no-dump-schema`, `DATABASE_URL` connecting as `app_owner`.
 - First migration (created with `npm run db:new -- init`): a platform `tenants` table (with `active`) and one tenant-owned table (for example `tenant_settings`), both with RLS enabled and forced, policies and grants to `app_runtime` as in the Multi-tenant rules.
@@ -111,18 +120,23 @@ All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (
   - Database: RLS enabled and forced on every `public` table, and `app_runtime` owns none; cross-tenant select, insert, update and delete are denied; no tenant set returns zero rows; an inactive tenant is invisible to `app_runtime`.
   - API: `GET /api/health` returns 200; `GET /api/me` returns 401 without a token, 403 for a token with no tenant, 403 for an unknown or inactive tenant, 200 for an active tenant, and 500 (not 401) when the database fails.
   - E2E: one test.
+  - Functions load: `npx firebase-tools emulators:exec --only functions --project demo-<project-name> "curl -sf <emulator-url>/api/health"` returns 200. It proves Firebase can load the function, which Vitest never checks.
 
 ## Owner setup
-One-time steps in Google Cloud that `/agentic-init` cannot do. List them in the final report as a checklist for the owner:
-0. If the project belongs to the client's Google Workspace organization and the developer uses an outside account, the organization policy blocks adding them (`Domain Restricted Sharing`). See "Project in a client's repository" in the template README for the per-project override.
-1. Upgrade the Firebase project to Identity Platform; enable multi-tenancy if the app is multi-tenant.
-2. Create the Cloud SQL for PostgreSQL 16 instance in the chosen region, the database, and the `app_owner` and `app_runtime` roles with strong passwords.
-3. Store both passwords in Secret Manager and give the functions' service account access to the runtime one only.
-4. Set up Workload Identity Federation for this GitHub repository and a deploy service account. Put the provider and the service account email in GitHub repository variables (they are not secrets).
-5. Set a budget alert on the billing account.
+The Google Cloud and GitHub steps `/agentic-init` cannot do are in `docs/deploy-setup.md` (copied from `profiles/firebase-postgres-deploy.md`). In the final report, point the owner to it and list its steps as a checklist. Every step in it was needed on a real first deploy, including the temporary roles and the organization-policy cases, so do not shorten it.
 
 ## CI
 - Add a `postgres:16` service container, run `db/init/01-roles.sql` with `psql`, then `npm run db:migrate`.
 - Add `actions/setup-java` (Java 21) before tests so the emulators can run.
 - Run lint, check-copy, unit (`npm test`), database (`npm run test:db`), API (`npm run test:api`) and E2E tests, each as its own step.
-- Deploy job (on `main` only, after tests): authenticate with `google-github-actions/auth` using Workload Identity Federation; start the Cloud SQL Auth Proxy; run `dbmate up` as `app_owner` with the password read from Secret Manager; then `firebase deploy --only hosting,functions`. Leave the job commented out until the owner finishes the Owner setup.
+- A functions-load step in the main job: the emulator smoke test from Baseline.
+- GitHub Variables, the same names everywhere (`docs/deploy-setup.md`, `ci.yml`, `.env.example`): `FIREBASE_PROJECT_ID`, `GCP_REGION`, `CLOUD_SQL_INSTANCE`, `WIF_PROVIDER`, `DEPLOY_SERVICE_ACCOUNT`, `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MESSAGING_SENDER_ID`. No GitHub Secrets are needed. In `.env.example` they appear only as a comment, never as `NAME=`: an empty line there would override the local values above it.
+- Deploy job (push to `main` only, `needs` every test job, `concurrency` without cancel-in-progress, permissions `contents: read` and `id-token: write`):
+  1. `google-github-actions/auth` with `vars.WIF_PROVIDER` and `vars.DEPLOY_SERVICE_ACCOUNT`. No keys.
+  2. The Cloud SQL Auth Proxy at a pinned version on `127.0.0.1:5432`.
+  3. Migrations: read `DB_OWNER_PASSWORD` with `gcloud secrets versions access`, `echo "::add-mask::..."` before any use, and run `dbmate up` as `app_owner` with `sslmode=disable` (the proxy encrypts). The password stays inside that step.
+  4. Build with `VITE_USE_EMULATORS=false` and the `vars.VITE_*`.
+  5. `npx firebase-tools deploy --only hosting,functions --project ${{ vars.FIREBASE_PROJECT_ID }} --non-interactive`.
+  6. Health check that fails the job on anything but 200: `curl -fsS --retry 5 --retry-delay 10 https://<project-id>.web.app/api/health`. A check that passes on 403 hides a function nobody can call.
+- Preview job (pull requests from the same repository only, permissions `contents: read`, `id-token: write`, `pull-requests: write`): same auth and build, `npx firebase-tools hosting:channel:deploy pr-<number> --expires 7d --json`, read the channel URL from the JSON, and post or update one PR comment with it (for example `gh pr comment --edit-last` falling back to a new comment, with `GH_TOKEN: ${{ github.token }}`). Hosting only: no functions, no migrations. The preview's `/api` calls reach the live function.
+- Leave both jobs commented out until `docs/deploy-setup.md` is done. The pull request that enables them runs the preview first; merging it is the first deploy.

@@ -4,7 +4,7 @@ Registered in `.claude/settings.json`. Each one is a small Node script that read
 
 | Hook | Event | What it does | Blocks? |
 |---|---|---|---|
-| `protect-files.mjs` | PreToolUse (Read, Edit, Write, MultiEdit, Grep, Glob, Bash) | Stops any access to `.env`, keys and service-account files. `.env.example` is allowed. | Yes (exit 2) |
+| `protect-files.mjs` | PreToolUse (Read, Edit, Write, MultiEdit, Grep, Glob, Bash) | Stops any access to `.env`, `.secret.local`, keys and service-account files. Allowed: `.env.example`, and the exact paths in `.claude/public-env-files` (committed env files with no secrets, such as `functions/.env.<project-id>`). | Yes (exit 2) |
 | `scripts/check-copy.mjs --hook` | PostToolUse (Edit, Write, MultiEdit) | Checks an edited user-facing file against `copy-rules.json` and tells Claude to fix any match. No rules by default. | Feedback (exit 2) |
 | `format-on-edit.mjs` | PostToolUse (Edit, Write, MultiEdit) | Runs the project's Prettier on the edited file, if installed. | No |
 

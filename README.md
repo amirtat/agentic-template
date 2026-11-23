@@ -130,6 +130,9 @@ git push -u origin main
   ```
 
   Newer organizations may also enforce `iam.managed.allowedPolicyMembers`; turn its enforcement off for the project the same way (Console: IAM & Admin -> Organization Policies -> the policy -> Manage policy -> Override parent's policy). Check both with `gcloud org-policies describe <policy> --project=<project-id> --effective`, then grant the roles with `gcloud projects add-iam-policy-binding`. The rest of the organization stays restricted.
+
+  Organizations change other defaults too: the default compute account gets no roles (Cloud Build fails), and the deployed function may not be made public (`/api/health` answers 403). The firebase-postgres profile's `docs/deploy-setup.md` covers each case with its fix.
+- **First deploy (firebase-postgres).** Follow `docs/deploy-setup.md` in order. The pull request that enables the deploy job runs a hosting preview first, which proves the GitHub to Google connection before anything goes live; merging it is the first deploy.
 - On GitHub's free plan, a private repository has no branch protection rules and no CodeQL code scanning. The rule "never push to `main` without approval" is then enforced only by the hooks and by you. For code scanning on a free private repository, Semgrep in CI is a free alternative.
 
 ## Existing project
