@@ -23,7 +23,8 @@ Then build your first feature with `/product <what you want>` and follow [`WORKF
 CLAUDE.md                      Project rules. Filled in by /agentic-init
 WORKFLOW.md                    Cheat sheet: the 10-step feature cycle
 copy-rules.json                Characters to forbid in user-facing text (empty by default)
-docs/                          architecture, design-brief, flows/
+product/                       The owner's documents: design-brief, optional spec and roadmap. Agents never edit it
+docs/                          architecture, flows/, kept current by the docs hook
 feature-index/index.yaml       Feature -> files, data, docs (navigation for the agent)
 specs/features/                Spec, plan and test report for each feature
 .claude/settings.json          Hooks + deny rules (secrets, deploy, force push)
@@ -81,7 +82,7 @@ And once per repository on GitHub: Settings -> General -> Pull Requests -> **Aut
 1. On GitHub: **Use this template** -> new repository -> clone it.
 2. In Claude Code: `/agentic-init`, and answer the questions. It runs `npm install` at the end, which installs the git hooks.
 3. Review the changes and commit them on a branch.
-4. `/design-brief`.
+4. `/design-brief`. If there is an approved product spec, put it in `product/spec.md` (and a feature order in `product/roadmap.md`); `/product` and `/architect` read them.
 5. First feature: follow `WORKFLOW.md`.
 
 ## Working on an existing clone
@@ -137,7 +138,7 @@ git push -u origin main
 
 ## Existing project
 
-On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `specs/`, `copy-rules.json`, and `CLAUDE.md` (only if the project has none). Then run `/agentic-init`, then `/bootstrap-docs`.
+On a new branch, copy `.claude/`, `.githooks/`, `scripts/`, `feature-index/`, `specs/`, `product/`, `copy-rules.json`, and `CLAUDE.md` (only if the project has none). Then run `/agentic-init`, then `/bootstrap-docs`.
 
 ## Rules every project gets
 

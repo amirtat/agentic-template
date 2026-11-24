@@ -37,15 +37,14 @@ Watch it live: `tail -f .git/update-docs.log`
    - the commit message starts with `docs:` (this is what stops the hook from reacting to its own commit);
    - the commit only touches files under `docs/`;
    - `docs/` already has uncommitted changes (so your work in progress is never swept into an automated commit).
-3. It snapshots `docs/design-brief.md`.
-4. It builds a prompt (instructions, commit message, diff) and runs `claude -p` under a timeout.
-5. Claude reads `docs/README.md` and the existing `docs/flows/*.md`, then decides per changed area:
+3. It builds a prompt (instructions, commit message, diff) and runs `claude -p` under a timeout.
+4. Claude reads `docs/README.md` and the existing `docs/flows/*.md`, then decides per changed area:
    - **update** an existing doc;
    - **create** `docs/flows/<name>.md` for a genuinely new flow, following the existing structure and adding it to the `docs/README.md` index;
    - **no change** (refactors, tests, config, styling, small tweaks).
    It may also update `docs/architecture.md` if the overall structure changed.
-6. The script restores `docs/design-brief.md` if it changed, stages only the changed files under `docs/`, and commits `docs: update for <short-sha>`. If nothing changed it logs `no doc changes` and makes no commit.
-7. It logs an `end` line.
+5. The script stages only the changed files under `docs/`, and commits `docs: update for <short-sha>`. If nothing changed it logs `no doc changes` and makes no commit.
+6. It logs an `end` line.
 
 On a timeout or a non-zero exit from Claude, the script logs it and does not commit. Partial edits may remain in `docs/`; review them with `git status`.
 
@@ -55,7 +54,7 @@ On a timeout or a non-zero exit from Claude, the script logs it and does not com
 claude -p
   --tools "Read,Grep,Glob,Edit,Write"
   --allowedTools "Read,Grep,Glob,Edit(docs/**),Edit(feature-index/**)"
-  --disallowedTools "Edit(docs/design-brief.md)"
+  --disallowedTools "Edit(product/**)"
   --permission-mode dontAsk
   --no-session-persistence
 ```
@@ -64,7 +63,7 @@ claude -p
 |---|---|
 | `--tools` without Bash | The job runs unattended. With no shell, a bad or injected instruction in a diff cannot run commands. |
 | `Edit(docs/**)` | Writes are limited to `docs/`. This rule covers every file-editing tool; a separate `Write(...)` rule is rejected by the CLI. |
-| Deny `docs/design-brief.md` | The brief is human-owned UI direction. The script also restores it afterwards, as a second layer. |
+| Deny `product/**` | The owner's folder (design brief, product spec, roadmap). Already outside `docs/**`; the explicit deny states the intent. The script also stages only `docs/` and `feature-index/`. |
 | `--permission-mode dontAsk` | Nobody is there to answer prompts, so anything not allowed is denied instead of hanging. |
 | No `--model` | Inherits your default model. |
 | Prompt on stdin | `--allowedTools` is variadic and would swallow a positional prompt. |
@@ -83,7 +82,7 @@ The hook inherits the environment of the shell that runs `git commit`, so export
 ## What to customize
 
 - **Skip rules:** the `case` and `non_docs` checks near the top of the script.
-- **Protected files:** the `brief` variable, the `--disallowedTools` flag, and the restore step. Add more files there if other docs are human-owned.
+- **Protected files:** human-owned documents go in `product/`, outside the hook's reach. Keep the `--disallowedTools` flag in step with it.
 - **Prompt:** the heredoc in the script. Adjust the outcomes and rules to your docs layout.
 - **Scope:** the folder in `Edit(docs/**)` and in the `git ls-files` call, if your docs live elsewhere.
 

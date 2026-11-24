@@ -5,7 +5,7 @@
 
 ## Overview
 {{ONE_PARAGRAPH: what the product does, for whom, and the user roles}}
-Read `docs/` for background, `docs/flows/` for behavior, `docs/design-brief.md` for UI direction, and `feature-index/index.yaml` to find the files behind a feature. Don't copy their content here.
+Read `product/` for what the product should be (`design-brief.md` for UI direction; `spec.md` and `roadmap.md` when present), `docs/` for how the code works today, `docs/flows/` for behavior, and `feature-index/index.yaml` to find the files behind a feature. Don't copy their content here.
 <!-- Why: one source per fact. Duplicated docs drift, and Claude then trusts the stale copy. -->
 
 ## Stack
@@ -63,7 +63,7 @@ Work flows through skills, each with one job and one output file under `specs/fe
 ## Docs
 - After every commit, a post-commit hook asks headless Claude to update `docs/` and `feature-index/index.yaml` and commits the result as `docs: update for <sha>`. Review those commits.
 - Your commit messages must not start with `docs:` or the hook skips them.
-- `docs/design-brief.md` is owned by the human. Never edit it unless asked.
+- `product/` is owned by the human. Never edit it unless asked (`/design-brief` writes `product/design-brief.md` when the owner runs it). The docs hook can only write to `docs/` and `feature-index/`.
 
 ## Git and commits
 - Work on a feature branch, never on `main`.

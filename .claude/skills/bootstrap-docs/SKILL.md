@@ -28,5 +28,5 @@ The post-commit hook maintains docs; it does not create them from nothing. Run t
 - Keep each doc lean: aim for under 150 lines, bullets over paragraphs, link to code instead of pasting it.
 - Document known limitations as limitations, not as bugs to fix.
 - Never put real personal data in docs.
-- Do not touch `docs/design-brief.md` (use `/design-brief`).
+- Do not touch `product/` (the owner's folder; the brief comes from `/design-brief`).
 - Do not modify any file outside `docs/` and `feature-index/`. Do not commit.

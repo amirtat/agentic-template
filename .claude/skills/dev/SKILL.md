@@ -14,7 +14,7 @@ Input: an approved plan written by `/architect`.
 2. **Confirm approval.** Implement only a plan the user approved in so many words. A request to run this skill on a named plan counts as approval of that plan.
 3. **Read the plan, its spec and `CLAUDE.md`** before starting. The user may have revised the plan. Where the plan and the spec now disagree, ask.
    <!-- Why: the approved plan is the contract, not your memory of the draft. -->
-4. **Implement** exactly the approved plan, following `CLAUDE.md` (working rules, product rules, conventions, security) and `docs/design-brief.md`.
+4. **Implement** exactly the approved plan, following `CLAUDE.md` (working rules, product rules, conventions, security) and `product/design-brief.md`.
    - Use the labels and messages from the spec's UI contract verbatim, through the strings file, never hard-coded.
    - Every screen you add or change works at 375px wide. Use logical CSS properties only.
    - Follow the "Accessible" product rule: native elements, labels, keyboard use, visible focus, announced messages.

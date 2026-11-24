@@ -12,7 +12,7 @@ Decide the mode from the request: a new plan, answers to your earlier questions,
 
 ## Plan
 
-1. **Read** the spec in full, then `CLAUDE.md`, `docs/README.md`, `docs/architecture.md`, the relevant `docs/flows/*.md`, `docs/design-brief.md` and `feature-index/index.yaml`. Read the code you expect to change (the feature index lists it).
+1. **Read** the spec in full, then `CLAUDE.md`, `docs/README.md`, `docs/architecture.md`, the relevant `docs/flows/*.md`, `product/design-brief.md`, `product/spec.md` and `product/roadmap.md` when present, and `feature-index/index.yaml`. Read the code you expect to change (the feature index lists it).
    <!-- Why: the plan must follow the project's layering and conventions. Those live in CLAUDE.md and docs/, not in this skill. -->
 2. **Map first** if the change touches auth, permissions, rules or policies, the data model, money, or tenant boundaries: describe the current code path in the plan's Approach before proposing a change.
 3. **Ask** if the spec leaves a blocking question (data model, auth, error paths). Do not choose silently. End the questions with: "Answer with `/architect <your answers>` so the plan is written on the planning model."
