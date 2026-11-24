@@ -16,7 +16,7 @@ Input: a feature request from the user. Output: one spec file at
    - On `main` with uncommitted changes, or if the pull fails: stop and report. Do not stash, reset or merge.
    - Already on another branch: ask whether this feature continues there or starts fresh from `main`.
    <!-- Why: `main` on this machine does not update itself after a merge on GitHub. A branch cut from a stale `main` lacks the last merged work and conflicts later. -->
-1. **Read the ground truth.** `CLAUDE.md`, `docs/README.md`, `feature-index/index.yaml`, the relevant `docs/flows/*.md`, and `docs/design-brief.md`.
+1. **Read the ground truth.** `CLAUDE.md`, `docs/README.md`, `feature-index/index.yaml`, the relevant `docs/flows/*.md`, and `product/design-brief.md`. If `product/roadmap.md` exists, find the feature's row (scope, dependencies) and say which row this spec covers; if `product/spec.md` exists, read its sections for this feature. Items the product spec marks as add-ons or out of scope go under Out of scope unless the user asks for them.
    <!-- Why: the flows describe current behavior and the brief sets copy and states. A spec written without them contradicts the app or invents UI. -->
 2. **Check the real code** (routes, pages, components, API endpoints or functions, the strings file) wherever the spec will name a route, label, heading or message. Use the feature index to find them.
    <!-- Why: docs drift. The UI contract is what E2E tests will assert, so a label copied from a doc instead of the code produces tests that fail for the wrong reason. -->
@@ -41,7 +41,7 @@ Input: a feature request from the user. Output: one spec file at
      <!-- Why: qa writes tests from this section before the feature exists. Anything not listed is something the test author has to guess. -->
    - **Out of scope**: what this feature deliberately does not do, including nearby known limitations from `docs/architecture.md` that you are not fixing.
    - **Open questions**: unresolved, non-blocking decisions, each with a suggested default.
-6. **Check against the docs.** Labels follow the tone and state patterns in `docs/design-brief.md`. Nothing contradicts a flow doc unless the spec says the behavior is changing.
+6. **Check against the docs.** Labels follow the tone and state patterns in `product/design-brief.md`. Nothing contradicts a flow doc unless the spec says the behavior is changing.
 7. **Report** the file path and list the open questions.
 
 <!-- CUSTOMIZE: the spec sections and the AC numbering scheme. If you change step 5, keep a testable-criteria section and a UI contract so downstream steps still have something to work from. -->

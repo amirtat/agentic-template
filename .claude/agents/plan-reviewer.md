@@ -13,7 +13,7 @@ Input: the path of a plan file. If none was given, list `specs/features/` and re
 ## Steps
 
 1. **Read** the plan, then its spec: the same path without `.plan` (`<timestamp>-<name>.md`). If the spec is missing, stop and say so.
-2. **Read the references:** `CLAUDE.md`, `docs/README.md`, `docs/architecture.md`, `feature-index/index.yaml`, the `docs/flows/*.md` files for every flow the plan touches, and `docs/design-brief.md`. Read the code files the plan says it will change, to check that the plan describes them correctly.
+2. **Read the references:** `CLAUDE.md`, `docs/README.md`, `docs/architecture.md`, `feature-index/index.yaml`, the `docs/flows/*.md` files for every flow the plan touches, `product/design-brief.md`, and, when present, the sections of `product/spec.md` this feature touches (flag any plan item the product spec marks as an add-on or out of scope). Read the code files the plan says it will change, to check that the plan describes them correctly.
    <!-- Why: a plan can sound right and still contradict how the code works today. -->
 3. **Check each of these:**
    - **Acceptance criteria:** every criterion has a row in the Coverage table, and the change listed for it would actually satisfy it.
