@@ -46,12 +46,12 @@ Watch it live: `tail -f .git/update-docs.log`
 5. The script stages only the changed files under `docs/`, and commits `docs: update for <short-sha>`. If nothing changed it logs `no doc changes` and makes no commit.
 6. It logs an `end` line.
 
-On a timeout or a non-zero exit from Claude, the script logs it and does not commit. Partial edits may remain in `docs/`; review them with `git status`.
+On a timeout or a non-zero exit from Claude, the script logs it and does not commit. Check `.git/update-docs.log` after your first few commits: a run that ends in `claude exited with code` means the docs are not being updated. Partial edits may remain in `docs/`; review them with `git status`.
 
 ## What Claude is allowed to do
 
 ```
-claude -p
+env -u CLAUDECODE claude -p
   --tools "Read,Grep,Glob,Edit,Write"
   --allowedTools "Read,Grep,Glob,Edit(docs/**),Edit(feature-index/**)"
   --disallowedTools "Edit(product/**)"
@@ -64,6 +64,7 @@ claude -p
 | `--tools` without Bash | The job runs unattended. With no shell, a bad or injected instruction in a diff cannot run commands. |
 | `Edit(docs/**)` | Writes are limited to `docs/`. This rule covers every file-editing tool; a separate `Write(...)` rule is rejected by the CLI. |
 | Deny `product/**` | The owner's folder (design brief, product spec, roadmap). Already outside `docs/**`; the explicit deny states the intent. The script also stages only `docs/` and `feature-index/`. |
+| `env -u CLAUDECODE` | A commit made by Claude Code runs the hook with `CLAUDECODE` set, and `claude` refuses to start inside another session (every run would end in `code 1` and the docs would never update). The hook is a separate background process, so it removes the marker. |
 | `--permission-mode dontAsk` | Nobody is there to answer prompts, so anything not allowed is denied instead of hanging. |
 | No `--model` | Inherits your default model. |
 | Prompt on stdin | `--allowedTools` is variadic and would swallow a positional prompt. |

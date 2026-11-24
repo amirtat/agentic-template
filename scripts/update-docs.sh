@@ -84,8 +84,10 @@ PROMPT
   echo
 } > "$tmp/prompt.txt"
 
+# Commits made from inside Claude Code inherit CLAUDECODE, and claude refuses to start
+# inside another session. This run is a separate background process, so drop the marker.
 # 3/4. Run claude -p under a timeout (timeout, gtimeout, or a shell watchdog).
-claude_cmd=(claude -p
+claude_cmd=(env -u CLAUDECODE claude -p
   --tools "Read,Grep,Glob,Edit,Write"
   --allowedTools "Read,Grep,Glob,Edit(docs/**),Edit(feature-index/**)"
   --disallowedTools "Edit(product/**)"
