@@ -151,7 +151,9 @@ firebase functions:artifacts:setpolicy --project <project-id> --location <region
 
 ## Step 7: web app and GitHub variables
 
-Firebase console -> Project settings -> General -> Your apps -> Web (`</>`) -> nickname -> Register app (do not tick Hosting). Keep `apiKey`, `authDomain`, `appId` and `messagingSenderId`. They are public: every browser receives them.
+Firebase console -> Project settings -> General -> Your apps -> Web (`</>`) -> nickname -> Register app (do not tick Hosting). Keep `apiKey`, `appId` and `messagingSenderId`. They are public: every browser receives them.
+
+`authDomain` is the app's own domain, not the `<project-id>.firebaseapp.com` Firebase shows: on iPhone, Safari separates storage between domains and Google sign-in fails with "missing initial state". Add the matching sign-in handler to Google: Console -> Google Auth Platform -> Clients -> the Web client (auto created by Google Service) -> Authorized redirect URIs -> add `https://<project-id>.web.app/__/auth/handler` -> Save. When a custom domain is connected, add `https://<custom-domain>/__/auth/handler` the same way and switch the variable to that domain.
 
 GitHub repository -> Settings -> Secrets and variables -> Actions -> **Variables** (not Secrets; none of these is secret). One variable per form:
 
@@ -163,7 +165,7 @@ GitHub repository -> Settings -> Secrets and variables -> Actions -> **Variables
 | `WIF_PROVIDER` | output of step 5 (`projects/<project-number>/locations/global/...`) |
 | `DEPLOY_SERVICE_ACCOUNT` | `github-deployer@<project-id>.iam.gserviceaccount.com` |
 | `VITE_FIREBASE_API_KEY` | `apiKey` |
-| `VITE_FIREBASE_AUTH_DOMAIN` | `authDomain` |
+| `VITE_FIREBASE_AUTH_DOMAIN` | `<project-id>.web.app` (later the custom domain), **not** the `authDomain` Firebase shows |
 | `VITE_FIREBASE_APP_ID` | `appId` |
 | `VITE_FIREBASE_MESSAGING_SENDER_ID` | `messagingSenderId` |
 
@@ -187,6 +189,28 @@ gcloud projects remove-iam-policy-binding $PROJECT --member=user:$ME --role=role
 ```
 
 This is safe by design: every route except `/api/health` requires a verified token. The binding survives later deploys.
+
+## When a feature needs more (before merging that feature)
+
+Do only the parts the feature uses, before its pull request is merged, and tick them in the pull request.
+
+- **Google sign-in:** Firebase console -> Authentication -> Sign-in method -> Add provider -> Google -> Enable. Set "Public-facing name" to the product name (users see it on Google's consent screen; the default `project-<number>` looks broken) and the support email to a real address. Save.
+- **The API creates identity tenants** (multi-tenant apps that add customers from the app): Allow tenants is on (step 1), and the API's account may manage tenants:
+
+  ```bash
+  gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:app-api@$PROJECT.iam.gserviceaccount.com --role=roles/identityplatform.admin --condition=None
+  ```
+
+  Never add a tenant by hand in the console: the app creates each one together with its database row.
+- **Files in Cloud Storage** (uploads read through signed URLs): one bucket, access on the bucket only, and the right to sign URLs as itself. Put the bucket name in `functions/.env.<project-id>`.
+
+  ```bash
+  gcloud storage buckets create gs://$PROJECT-files --location=$REGION --uniform-bucket-level-access --public-access-prevention
+  gcloud storage buckets add-iam-policy-binding gs://$PROJECT-files --member=serviceAccount:app-api@$PROJECT.iam.gserviceaccount.com --role=roles/storage.objectAdmin
+  gcloud iam service-accounts add-iam-policy-binding app-api@$PROJECT.iam.gserviceaccount.com --member=serviceAccount:app-api@$PROJECT.iam.gserviceaccount.com --role=roles/iam.serviceAccountTokenCreator
+  ```
+
+- **First platform admin** (after the deploy that adds platform admins): Cloud SQL Studio, database `app`, user `postgres` (password: step 3, item 1), then `insert into platform_admins (email) values ('<google-email-in-lower-case>');` and check with `select email from platform_admins;`. More admins are added the same way.
 
 ## Developer's standing access after setup
 

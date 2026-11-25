@@ -56,7 +56,11 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
   4. Once a users table exists: the user, role and status are loaded from the database on every request, so a disabled user is blocked at once. Unknown or disabled user: 403.
   5. A database error in any of these steps: 500 with a generic message, logged without the token or personal data. Never turned into a 401.
   <!-- Why: a catch-all that answers 401 hides a database outage as "signed out" and leaves nothing in the logs. -->
-- `express.json({ limit: '100kb' })`, or a smaller limit; larger bodies only on a route that needs them.
+- Request size: a `requireBodyLimit(maxBytes)` middleware that checks `Buffer.byteLength(req.rawBody)`, falling back to the `Content-Length` header when `rawBody` is missing (supertest), and answers 413. Mount it app-wide at 100 KB; a route that needs more (an upload) is mounted before it with its own limit. `express.json()` stays, with a permissive limit (1 MB), so it never rejects first.
+  <!-- Why: in Cloud Functions the framework parses the body before Express runs, so `express.json({ limit })` never fires in production. Only `rawBody` is reliable. -->
+- File uploads: JSON `{ data: "<base64>" }`, not multipart. The server decodes, checks the magic bytes (never the client's type or file name) and the decoded size, then writes to Cloud Storage. Under the Functions emulator (`FUNCTIONS_EMULATOR === 'true'`) it returns a stub URL and skips Storage. The bucket name comes from `functions/.env.<project-id>`. Reads go through a signed URL generated per request (one hour), never stored in the database.
+  <!-- Why: multer and busboy fail in Cloud Functions ("Unexpected end of form") because the body was already read. Base64 costs a third more bytes and works everywhere. -->
+- Async middleware calls `next()` outside its promise chain (or passes errors with `next(err)`), so an error thrown later in the request is not reported as an auth failure.
 - Tenant data is reached only through `withTenant(tenantId, async (client) => ...)`. It opens a transaction, runs `select set_config('app.tenant_id', $1, true)` (transaction-scoped, safe with pooling), runs the callback and commits. Route code never calls `pool.query` on tenant tables directly.
 - Validate every input with zod on the server. Parameterized queries only, never string-built SQL.
 - Return safe error messages with the right status; log details with `logger`, never personal data.
@@ -71,6 +75,9 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 ### Client
 - One `src/services/*.js` file per data area, built on one `apiFetch` helper that adds the current ID token. Components never call `fetch` directly.
 - The client has no database credentials and does not use Firestore or Storage directly.
+- `authDomain` in the Firebase config is the domain the app is served from (`<project-id>.web.app`, later the custom domain), never `<project-id>.firebaseapp.com`. Firebase Hosting serves the sign-in handler on every domain it hosts.
+  <!-- Why: Safari on iPhone partitions storage between domains, so a Google popup on firebaseapp.com fails with "missing initial state" while desktop works. -->
+- A button that is unavailable while a request runs is `disabled` and keeps its accessible name (the spinner is `aria-hidden`); a second click never sends a second request.
 - Pages in `src/pages/`, shared UI in `src/components/`, one PascalCase component per file.
 - All user-facing text in `src/i18n/<lang>.json` (the primary language's code, for example `en.json`), read through one `t()` helper.
 - No hardcoded colors or sizes; values live in `src/styles/tokens.css`.
@@ -91,7 +98,12 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 - API tests: `functions/test/`, Vitest + supertest on the Express app, with real ID tokens from the Auth emulator and the local Postgres, so RLS runs for real. Mock the database or the Admin SDK only for a path that cannot be produced otherwise (for example a database outage), and say so in the test name.
   <!-- Why: an API test against a mocked database proves the code, not the policy. The tenant boundary lives in the policy. -->
 - Every route has at least one allowed test (the right role in the right tenant gets 200) next to its denied tests. A route that only has denied tests would pass even if it always refused.
+- A middleware that every route of a kind must use (the auth middleware on every route but `/api/health`; `checkViewOnly` on every tenant write) has a guard test in `functions/test/` that walks the Express router stack, including mounted routers, and fails naming the first route without it. The test proves it can fail with a throwaway app built inside the test, and fails loudly on a route path it cannot resolve.
+  <!-- Why: "remember to mount it" is forgotten on the third feature. A guard test turns the rule into a red CI run. -->
 - E2E: Playwright in `e2e/`, projects `desktop` and `mobile`, against the emulators and the local Postgres with seeded invented data (`db/seed.sql`). SAML and OIDC cannot be emulated: E2E signs in Auth emulator users inside the right tenant, and enterprise SSO is checked by hand against a test identity provider before release.
+- E2E sign-in happens once per run: a `setup` project signs in and saves `storageState({ path: 'e2e/.auth/<role>.json', indexedDB: true })` (Firebase Auth keeps its session in IndexedDB); the other projects depend on it and load that state. Tests of the sign-in flow itself opt out with `test.use({ storageState: { cookies: [], origins: [] } })`. `e2e/.auth/` is git-ignored. Workers are capped at 2, since all tests share one emulator. Never raise timeouts to hide contention.
+  <!-- Why: signing in through the emulator popup in every beforeEach made 1 to 5 tests time out per run, different ones each time. -->
+- When a screen renders both a desktop table and mobile cards and CSS hides one, locators are scoped to the visible container (`testInfo.project.name` picks it). A check that something is hidden must look in the container that would show it; otherwise it passes even when the feature is broken.
 
 ## Multi-tenant
 - Identity Platform multi-tenancy: one identity tenant per customer. The `tenants` table maps `idp_tenant_id` to the internal `id`. The client sets `auth.tenantId` before sign-in, resolved from the tenant's sign-in URL.
@@ -99,6 +111,13 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
   <!-- Why: on a pooled connection a transaction-scoped setting reverts to '' (not null) after its first use, and ''::uuid throws instead of matching nothing. -->
 - The `tenants` table has `active boolean not null default true`. `app_runtime` may only `select`, and a policy limits it to active tenants. Only `app_owner` (migrations) and platform-admin routes change tenants.
 - Platform-level tables (the tenants list, platform admins) have no `tenant_id`, are reached only by platform-admin routes, and give no path into tenant data unless a spec says so.
+- Platform admins (the app owner's staff who create and configure tenants), when a spec needs them:
+  - Their own sign-in at project level (no tenant), their own middleware (`requirePlatformAuth`) and their own router under `/api/platform`, never mounted through the tenant auth middleware. Checks in order: valid token (else 401); no `firebase.tenant`, `email_verified` true, sign-in provider in an allowlist, lower-cased email in `platform_admins` (else 403); database error 500.
+  - `withPlatform(fn)`, a sibling of `withTenant`, sets `app.context = 'platform'` (transaction-scoped) and never sets `app.tenant_id`. Policies that let `app_runtime` insert or update `tenants`, or read `platform_admins`, require that context.
+  - `platform_admins` has no write grant for `app_runtime`: the first admin is added by hand in Cloud SQL Studio after the first deploy (`docs/deploy-setup.md`), never through the API.
+  - Creating a tenant also creates its Identity Platform tenant, in this order: duplicate check, create the identity tenant (sign-in methods off until configured), then insert the row and its audit entry in one transaction. If the insert fails, delete the identity tenant; if that fails too, log its id as an orphan.
+  - Tenants are never deleted through the API. A `status` (`active`, `view_only`, `inactive`) replaces deletion. A `checkViewOnly` middleware goes on every tenant write route, enforced by a guard test (see TEST_RULES).
+  - An `audit_log` table (who, action, target, before and after) written in the same transaction as the change; `app_runtime` gets `insert` and `select` only.
 - Adversarial tests: a user of tenant A gets zero rows from tenant B and cannot insert, update or delete there; a query with no tenant set returns zero rows; a token from tenant A cannot be used on a tenant B route; `app_runtime` cannot see an inactive tenant, and its token gets 403.
 
 ## Multi-language
@@ -115,6 +134,8 @@ All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (
 - `firestore.rules` and `storage.rules` that deny all reads and writes, linked from `firebase.json`. They stay deny-all even though the app does not use Firestore or Storage from the client.
 - The auth middleware as described in Conventions. There is no users table yet, so it stops after the tenant check. Write both of these in a "Known gaps" section of `docs/architecture.md`: the user lookup arrives with the first users feature; and tokens are not checked for revocation (`verifyIdToken(token, true)`), which is acceptable once the per-request user status check exists.
 - `firebase.json`: Hosting rewrite `/api/**` to the `api` function in the chosen region, then the single-page fallback `**` to `/index.html`.
+- `vite.config.js` proxies `/api` to the Functions emulator (`http://127.0.0.1:5001/demo-<project-name>/<region>/api`), so the dev server and E2E reach the API at the same path as production.
+- `playwright.config.js` loads `.env` and stops with a clear message if `DATABASE_URL_RUNTIME` or `functions/.secret.local` is missing. Its `webServer` list starts the emulators (`--project demo-<project-name>`) and Vite; `PLAYWRIGHT_SKIP_EMULATORS=1` skips the emulators when they already run. Projects: `setup` (signs in once, see TEST_RULES), then `desktop` and `mobile`, which depend on it.
 - Smoke tests:
   - Unit: one Vitest test.
   - Database: RLS enabled and forced on every `public` table, and `app_runtime` owns none; cross-tenant select, insert, update and delete are denied; no tenant set returns zero rows; an inactive tenant is invisible to `app_runtime`.
@@ -126,7 +147,9 @@ All user-facing text is keyed in `src/i18n/<lang>.json` and read through `t()` (
 The Google Cloud and GitHub steps `/agentic-init` cannot do are in `docs/deploy-setup.md` (copied from `profiles/firebase-postgres-deploy.md`). In the final report, point the owner to it and list its steps as a checklist. Every step in it was needed on a real first deploy, including the temporary roles and the organization-policy cases, so do not shorten it.
 
 ## CI
-- Add a `postgres:16` service container, run `db/init/01-roles.sql` with `psql`, then `npm run db:migrate`.
+- Add a `postgres:16` service container, run `db/init/01-roles.sql` with `psql`, then `npm run db:migrate`, then load `db/seed.sql` exactly as `npm run db:reset` does locally (same role, `app_owner`, never the `postgres` superuser, so RLS still applies).
+  <!-- Why: without the seed, E2E signs in a user the database does not know; the API answers 403 and the test times out with no clue. -->
+- After each E2E step, `actions/upload-artifact` with `if: failure()` for `test-results/` and `playwright-report/`, 7-day retention, so a CI-only failure comes with the page state.
 - Add `actions/setup-java` (Java 21) before tests so the emulators can run.
 - Run lint, check-copy, unit (`npm test`), database (`npm run test:db`), API (`npm run test:api`) and E2E tests, each as its own step.
 - A functions-load step in the main job: the emulator smoke test from Baseline.

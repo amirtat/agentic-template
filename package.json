@@ -7,7 +7,8 @@
     "check-copy": "node scripts/check-copy.mjs",
     "lint": "echo \"lint not configured yet: run /agentic-init\"",
     "test": "echo \"tests not configured yet: run /agentic-init\"",
-    "test:e2e": "echo \"E2E not configured yet: run /agentic-init\""
+    "test:e2e": "echo \"E2E not configured yet: run /agentic-init\"",
+    "test:hooks": "node .claude/hooks/protect-files.test.mjs"
   },
   "engines": {
     "node": ">=22"

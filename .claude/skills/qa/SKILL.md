@@ -34,10 +34,12 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
    If no E2E tests exist yet for this spec (phase 1 was skipped on purpose), write them now from the spec only, in this fresh session, without reading the implementation code. Then run them.
 6. **If E2E tests fail on locators only** (element not found because of a name or role mismatch, with the behavior itself working), you may fix the locator in the test. Never change an assertion, expected text, status code or test data to get a pass. Record every locator change (file, old, new, why).
    <!-- Why: a locator is how a test finds the thing. An assertion is what the spec says must be true. Editing assertions turns tests into a mirror of the code. -->
+   A new locator must still be able to fail. A "not visible" check aimed at an element that is always hidden on that project (for example the desktop table on mobile) passes even when the feature is broken: aim it at the element that would show.
+   If tests pass alone but fail in the full run, find what they share (a sign-in in every `beforeEach`, one emulator, shared data) and report that as the cause. Do not recommend longer timeouts.
 7. **If an assertion fails**, or an assertion needs to change, do not fix it. Report the failure with the criterion number and evidence, and send the user back through the spec (`/product`), or to `/dev` if the code is wrong.
 8. **Write the test report** to `specs/features/<timestamp>-<name>.test-report.md`, reusing the spec's exact timestamp and name. Keep it short:
    - Result per level (unit, integration, E2E desktop, E2E mobile, accessibility checks, lint, copy check): command run, passed / failed / not run counts. For accessibility, list any axe rule that failed and where.
-   - Acceptance criteria table: `AC#`, covering test(s), status.
+   - Acceptance criteria table: `AC#`, covering test(s), status. Use the spec's own numbers and wording for every criterion, one row each, not the numbers in test titles (they drift). A criterion with no test is a row marked uncovered.
    - Locator changes made (or "none").
    - Failures: criterion, test, one-line cause.
    - Uncovered criteria or gaps.
