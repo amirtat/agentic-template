@@ -10,6 +10,8 @@ Registered in `.claude/settings.json`. Each one is a small Node script that read
 
 Notes:
 - `protect-files` also blocks `cp .env.example .env`. Create `.env` yourself.
+- `protect-files` ignores the message of a `git commit` (`-m`, `--message`, heredoc), so a message may mention `.env`. The rest of the command is still checked. A listed public env file is also allowed by its file name alone (after `cd` into its folder) and through a symlinked project path.
+- After changing `protect-files.mjs`, run `npm run test:hooks`.
 - Hooks are loaded when a session starts. After changing them, restart Claude Code and check with `/hooks`.
 
 ## Optional: long-file guard

@@ -63,6 +63,7 @@ Work flows through skills, each with one job and one output file under `specs/fe
 ## Docs
 - After every commit, a post-commit hook asks headless Claude to update `docs/` and `feature-index/index.yaml` and commits the result as `docs: update for <sha>`. Review those commits.
 - Your commit messages must not start with `docs:` or the hook skips them.
+- The hook runs in the background for a minute or two. Before the next commit or a push, wait until `git status` is clean and `git log --oneline -2` shows `docs: update for <sha>` on top (a commit that changes nothing it documents may get none). Committing while it runs can sweep its half-written files into your commit.
 - `product/` is owned by the human. Never edit it unless asked (`/design-brief` writes `product/design-brief.md` when the owner runs it). The docs hook can only write to `docs/` and `feature-index/`.
 
 ## Git and commits
