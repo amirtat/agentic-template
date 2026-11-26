@@ -16,7 +16,9 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
 2. **Write Playwright tests** only from the acceptance criteria and the UI contract. Keep a comment or test title that cites each criterion number (`AC3`).
    - Locate elements with `getByRole` and `getByLabel` (and `getByText` for plain messages). Use `getByTestId` only for ids the UI contract names.
      <!-- Why: role and label locators test what users see and survive refactors. Test ids couple tests to markup. -->
-   - Use the exact labels, headings and messages from the contract.
+   - Use the exact labels, headings and messages from the contract, with `exact: true` on name and text locators (`getByRole` names match substrings by default, so "חברות" also finds "ניהול חברות").
+   - Count with `await expect(locator).toHaveCount(n)`, which waits; `expect(await locator.count())` does not wait and fails on a slower runner.
+   - A test that applies to one project only calls `test.skip(testInfo.project.name !== 'mobile', 'mobile only')`; never return early, which reports a pass.
    - Every test runs in both Playwright projects, `desktop` and `mobile`. Where the contract lists a mobile difference, branch on the project name (`testInfo.project.name`) and assert the mobile behavior. Add at least one check that the page has no horizontal scroll on mobile (`document.documentElement.scrollWidth <= window.innerWidth`).
    - Accessibility: every test that reaches a screen or opens a dialog calls `expectNoA11yViolations(page)` from `e2e/a11y.js` in that state. For each form or dialog the feature adds, one test completes it with the keyboard alone (Tab, Shift+Tab, Enter, Escape) and checks where focus lands.
    - Set up the contract's "assumed test data" explicitly, with invented data. Each test creates what it needs and does not depend on another test's leftovers or on run order.
@@ -32,6 +34,8 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
 
 5. **Run everything** with the commands in `CLAUDE.md`: unit, integration, E2E (both projects), lint and `npm run check-copy`. A level with no command in `CLAUDE.md` is reported as "not run: no command", never skipped silently.
    If no E2E tests exist yet for this spec (phase 1 was skipped on purpose), write them now from the spec only, in this fresh session, without reading the implementation code. Then run them.
+   **While fixing, run only what failed** (`npx playwright test --last-failed`), in the foreground, never as a background task you poll. After three rounds with failures left, stop and report each one (test, project, cause, test bug or code bug). The full suite runs once, at the end.
+   <!-- Why: rerunning the whole suite after each fix turned one QA session into hours. -->
 6. **If E2E tests fail on locators only** (element not found because of a name or role mismatch, with the behavior itself working), you may fix the locator in the test. Never change an assertion, expected text, status code or test data to get a pass. Record every locator change (file, old, new, why).
    <!-- Why: a locator is how a test finds the thing. An assertion is what the spec says must be true. Editing assertions turns tests into a mirror of the code. -->
    A new locator must still be able to fail. A "not visible" check aimed at an element that is always hidden on that project (for example the desktop table on mobile) passes even when the feature is broken: aim it at the element that would show.
@@ -48,8 +52,8 @@ Input: a spec at `specs/features/<timestamp>-<name>.md`. If the user did not nam
 ## Do not
 
 - Modify application code, migrations, rules or config, or the unit and integration tests `/dev` wrote. Report problems instead.
-- Change an assertion, expected value or test data to make a test pass.
-- Mark a test `.skip`, `.only`, or `fixme`, or loosen a check, to get green.
+- Change an assertion, expected value or test data to make a test pass. When the code shows a text the spec does not ("אנגלית" where the spec says "English"), that is a code bug for `/dev`, never a test to edit. When the spec itself changed a text, update the tests and search them for the old text too, not only the new one.
+- Mark a test `.skip`, `.only`, or `fixme`, or loosen a check, to get green. (`test.skip(condition)` for a test that applies to one project only is fine.)
 - Write E2E tests from the implementation. Use the spec only.
 - Report a pass you did not see. Quote real command results.
 - Commit.

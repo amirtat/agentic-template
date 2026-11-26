@@ -27,7 +27,9 @@ Input: an approved plan written by `/architect`.
    <!-- Why: integration tests alone hide which unit broke. Using the project's own framework keeps the suite runnable by everyone. -->
 6. **Run lint, `npm run check-copy`, and the unit and integration tests** with the commands in `CLAUDE.md`. Fix failures in code you wrote. If a failure is pre-existing or outside the change, report it instead of fixing it.
    <!-- Why: "done" is only meaningful if the checks ran and you can show the result. -->
-7. **Report**: files changed, data changes, each new or changed unit and endpoint with the test that covers it (name anything left untested and why), the lint, copy-check and test results (exact pass/fail counts, including anything that did not run and why), and any deviation from the plan. Leave changes uncommitted.
+7. **Visual check** (when screens changed): with the app running, take a few Playwright screenshots of the changed screens (for example the main screen of each, at 1440px and 390px, in the primary language), compare each with the mockup in `product/reference/` and the design brief, and fix clear mistakes (layout, spacing, alignment, direction, colors). One round; keep the screenshots in `test-results/visual/` (git-ignored) and list them in the report so the owner sees the screens before a deploy.
+   <!-- Why: tests pass on a screen nobody looked at. The first platform screens shipped green and looked amateur. -->
+8. **Report**: files changed (from `git diff --stat`, never from memory), data changes, each new or changed unit and endpoint with the test that covers it (name anything left untested and why), the lint, copy-check and test results (exact pass/fail counts, including anything that did not run and why), and any deviation from the plan. Leave changes uncommitted.
 
 ## Do not
 

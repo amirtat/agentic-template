@@ -20,6 +20,8 @@ Input: a feature request from the user. Output: one spec file at
    <!-- Why: the flows describe current behavior and the brief sets copy and states. A spec written without them contradicts the app or invents UI. -->
 2. **Check the real code** (routes, pages, components, API endpoints or functions, the strings file) wherever the spec will name a route, label, heading or message. Use the feature index to find them.
    <!-- Why: docs drift. The UI contract is what E2E tests will assert, so a label copied from a doc instead of the code produces tests that fail for the wrong reason. -->
+2a. **Screens need a picture.** If the feature adds or redesigns screens and `product/reference/` has no approved mockup for them, say so and ask whether the owner wants one first. Write the UI contract from the mockup when there is one, and name its files in the spec.
+   <!-- Why: a spec in words alone produced screens that passed every test and looked amateur. -->
 3. **Ask before guessing.** If the request is ambiguous, or a needed fact is not in the docs or code, ask the user. Batch the questions into one message. Do not write the spec until the blocking ones are answered.
    <!-- Why: a guessed answer becomes an acceptance criterion, then code, then tests. Cheapest to fix here. -->
    Anything non-blocking goes in "Open questions" instead.
