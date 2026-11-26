@@ -80,7 +80,8 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 - `authDomain` in the Firebase config is the domain the app is served from (`<project-id>.web.app`, later the custom domain), never `<project-id>.firebaseapp.com`. Firebase Hosting serves the sign-in handler on every domain it hosts.
   <!-- Why: Safari on iPhone partitions storage between domains, so a Google popup on firebaseapp.com fails with "missing initial state" while desktop works. -->
 - A button that is unavailable while a request runs is `disabled` and keeps its accessible name (the spinner is `aria-hidden`); a second click never sends a second request.
-- Pages in `src/pages/`, shared UI in `src/components/`, one PascalCase component per file.
+- Pages in `src/pages/`, shared UI in `src/components/`, one PascalCase component per file. Shared primitives (button, card, field, text and number input, segmented control, status pill, data table with a mobile card list, page header, app header, save bar, language switcher) live in `src/components/ui/` and are built before the screens that need them.
+- Google sign-in button: Google's light button style with the official "G" from Google's sign-in branding package. The package's SVGs carry broken design-tool metadata and render through `foreignObject`: extract the mark with a script, drop the `data-figma-*` attributes, validate the XML, render it to a 3x PNG with Playwright, and use the PNG (keep the SVG as the source).
 - All user-facing text in `src/i18n/<lang>.json` (the primary language's code, for example `en.json`), read through one `t()` helper.
 - No hardcoded colors or sizes; values live in `src/styles/tokens.css`.
 
@@ -95,7 +96,7 @@ Config comes from `.env`. First time on a machine: `cp .env.example .env`, then 
 - Every policy or route-permission change ships with adversarial tests (the wrong role and the wrong tenant are denied).
 
 ## TEST_RULES
-- Unit tests: Vitest, next to the code as `*.test.js`, or in `tests/unit/`.
+- Unit tests: Vitest, next to the code as `*.test.js`, or in `tests/unit/`. React components are tested with Testing Library (`@testing-library/react`, `@testing-library/user-event`) in jsdom, inside Vitest, as `*.test.jsx`; one setup file runs `cleanup` after each test.
 - Database tests: `tests/db/`, Vitest against the local Postgres, connected as `app_runtime`. One file per table or policy touched, always including a cross-tenant denial case.
 - API tests: `functions/test/`, Vitest + supertest on the Express app, with real ID tokens from the Auth emulator and the local Postgres, so RLS runs for real. Mock the database or the Admin SDK only for a path that cannot be produced otherwise (for example a database outage), and say so in the test name.
   <!-- Why: an API test against a mocked database proves the code, not the policy. The tenant boundary lives in the policy. -->
